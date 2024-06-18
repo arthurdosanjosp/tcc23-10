@@ -6,13 +6,17 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "Schedul",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "image": "./assets/splash1.jpeg",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff",
+      "imageResizeMode": "cover",
+      "shouldResize": true
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.arthuranjos.Schedul"
     },
     "android": {
       "adaptiveIcon": {
@@ -22,6 +26,17 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "62163a74-b7a6-4a51-b8a3-bdbe41747042"
+      }
     }
   }
 }
