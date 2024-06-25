@@ -1,41 +1,44 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/AntDesign'
+import Icon from 'react-native-vector-icons/AntDesign';
 import { useRouter } from 'expo-router';
-import {Link} from 'expo-router'
-
+import { Link } from 'expo-router';
 
 const CriarContaScreen = () => {
     const router = useRouter();
     return (
         <View style={styles.container}>
             <Text style={styles.welcomeText}></Text>
-            <Image style={styles.imageTop} source={require('./img/bola5.png')} />
+            <Image style={styles.image} source={require('./img/bola6.png')} />
             <View style={styles.spacer} />
             <Text style={styles.title}>Criar Conta</Text>
-            <TextInput style={styles.input} placeholder="             Nome" />
-            <Icon style={styles.icon} name='user' size={25} color='gray' />
-            <TextInput style={styles.input} placeholder="             Email" keyboardType="email-address" />
-            <Icon style={styles.icon} name='mail' size={25} color='gray' />
-            <TextInput style={styles.input} placeholder="             Senha" secureTextEntry={true} />
-            <Icon style={styles.icon} name='lock' size={25} color='gray' />
-            <Image
-                style={styles.image}
-                source={require('./img/bola41.png')}
-            />
+            <View style={styles.spacer} />
+            <View style={styles.spacer} />
+
+
+
+            <View style={styles.inputContainer}>
+                <Icon name="user" size={25} color="gray" />
+                <TextInput style={styles.input} placeholder="Nome" />
+            </View>
+            <View style={styles.inputContainer}>
+                <Icon name="mail" size={25} color="gray" />
+                <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" />
+            </View>
+            <View style={styles.inputContainer}>
+                <Icon name="lock" size={25} color="gray" />
+                <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} />
+            </View>
+
             <Text style={styles.welcomeText}></Text>
             <View style={styles.spacer} />
             <View style={styles.buttonContainer}>
-
                 <Link href="/blocos/criarblocos" asChild>
                     <TouchableOpacity style={styles.button} onPress={() => console.log('Entrar')}>
                         <Text style={styles.buttonText}>CADASTRAR</Text>
                     </TouchableOpacity>
                 </Link>
-
             </View>
-
-
         </View>
     );
 };
@@ -52,9 +55,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 100,
-        top: -15,
+        top: 20,
     },
-    input: {
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         width: '80%',
         height: 50,
         borderRadius: 25,
@@ -66,7 +71,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 2,
         elevation: 2,
-        marginBottom: 10,
+        marginBottom: 30,
+    },
+    input: {
+        flex: 1,
+        marginLeft: 10,
+        color: '#000',
     },
     spacer: {
         height: 15,
@@ -74,7 +84,7 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'column',
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 40,
     },
     button: {
         backgroundColor: 'white',
@@ -85,39 +95,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginBottom: 60,
-
     },
     buttonText: {
         fontSize: 21,
         fontWeight: 'bold',
         color: 'black',
-
-
     },
     image: {
-        position: 'absolute',
-        top: '76%',
-        left: 0,
-        right: 0,
-        height: '30%',
-        width: '100%',
-    },
-    imageTop: {
         ...StyleSheet.absoluteFillObject,
         width: undefined,
-        height: '28%',
-        top: 0,
-        right: -0,
-        left: 0,
-
-
+        height: 'auto',
+        top: '-6%',
     },
     welcomeText: {
         marginBottom: 90,
-    },
-    icon: {
-        top: -48,
-        right: '32%'
     }
 });
 

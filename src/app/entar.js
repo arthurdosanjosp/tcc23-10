@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
-import Icon from 'react-native-vector-icons/AntDesign'
-import {Link} from 'expo-router'
+import Icon from 'react-native-vector-icons/AntDesign';
+import { Link } from 'expo-router';
 
 const EntrarScreen = () => {
     return (
@@ -11,19 +11,23 @@ const EntrarScreen = () => {
             <Text style={styles.title}>Entrar</Text>
             <Text style={styles.welcomeText}>Bem-Vindo de Volta!</Text>
             <Image style={styles.imageBottom} source={require('./img/bola2.jpeg')} />
-            <TextInput style={styles.input} placeholder="             Email" keyboardType="email-address" /> 
-            <Icon style={styles.icon} name='mail' size={25} color='gray'/>
-                  
-            <TextInput style={styles.input} placeholder="             Senha" secureTextEntry={true} />
-            <Icon style={styles.icon} name='lock' size={25} color='gray'/>
+            
+            <View style={styles.inputContainer}>
+                <Icon name='mail' size={25} color='gray'/>
+                <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" />
+            </View>
+            <View style={styles.inputContainer}>
+                <Icon name='lock' size={25} color='gray'/>
+                <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} />
+            </View>
                   
             <Text style={styles.forgotPasswordText}>Esqueci senha</Text>
             <View style={styles.buttonContainer}>
-            <Link href="/blocos/criarblocos" asChild>
-      <TouchableOpacity style={styles.button} onPress={() => console.log('Entrar')}>
-        <Text style={styles.buttonText}>ENTRAR</Text>
-      </TouchableOpacity>
-    </Link>
+                <Link href="/blocos/criarblocos" asChild>
+                    <TouchableOpacity style={styles.button} onPress={() => console.log('Entrar')}>
+                        <Text style={styles.buttonText}>ENTRAR</Text>
+                    </TouchableOpacity>
+                </Link>
             </View>
           
         </View>
@@ -48,7 +52,9 @@ const styles = StyleSheet.create({
         right: 56,
         marginBottom: 260,
     },
-    input: {
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         width: '80%',
         height: 55,
         borderRadius: 25,
@@ -60,8 +66,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 2,
         elevation: 2,
-        marginBottom: 0,
-        
+        marginBottom: 20,
+    },
+    input: {
+        flex: 1,
+        marginLeft: 10,
+        color: '#000',
     },
     forgotPasswordText: {
         fontSize: 12,
@@ -94,16 +104,6 @@ const styles = StyleSheet.create({
     imageTop: {
         ...StyleSheet.absoluteFillObject,
         width: undefined,
-        height: '25%',
-        top: -60,
-        right: -20,
-        left: 150,
-        margin: 10,
-        marginBottom: 200,
-    },
-    imageTop: {
-        ...StyleSheet.absoluteFillObject,
-        width: undefined,
         height: undefined,
         resizeMode: 'contain',
         top: -110,
@@ -121,10 +121,6 @@ const styles = StyleSheet.create({
         left: -80,
         right: '-6%',
         margin: 0,
-    },
-    icon:{
-        top: -39,
-        right: '32%'
     }
 });
 
