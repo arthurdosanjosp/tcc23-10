@@ -2,20 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { View, ImageBackground, TouchableOpacity, TextInput, StyleSheet, Text, FlatList, StatusBar, ScrollView, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Drawer from '../menu/Drawer2';
+import Drawer from '../menu/Drawer3';
 
-const ScheduleHeader = () => {
+const Favoritos = () => {
     const [isDrawerVisible, setDrawerVisible] = useState(false);
     const [data, setData] = useState([]);
     const [searchText, setSearchText] = useState('');
     const [filteredData, setFilteredData] = useState([]);
-    const [colunas, setColunas] = useState([]);
     const [checkedBlocks, setCheckedBlocks] = useState([]);
     const [favoritedBlocks, setFavoritedBlocks] = useState([]);
     const [hiddenBlocks, setHiddenBlocks] = useState([]);
     const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] = useState(false);
     const [blockToDeleteId, setBlockToDeleteId] = useState(null);
-
 
     useEffect(() => {
         const loadBlocks = async () => {
@@ -26,17 +24,6 @@ const ScheduleHeader = () => {
                 }
             } catch (error) {
                 console.error('Falha ao carregar blocos', error);
-            }
-        };
-
-        const loadColunas = async () => {
-            try {
-                const savedColunas = await AsyncStorage.getItem('colunas');
-                if (savedColunas !== null) {
-                    setColunas(JSON.parse(savedColunas));
-                }
-            } catch (error) {
-                console.error('Falha ao carregar colunas', error);
             }
         };
 
@@ -63,19 +50,19 @@ const ScheduleHeader = () => {
         };
 
         loadBlocks();
-        loadColunas();
         loadCheckedBlocks();
         loadFavoritedBlocks();
     }, []);
 
     useEffect(() => {
         const filterData = () => {
-            const filtered = data.filter(block => block.name.toLowerCase().includes(searchText.toLowerCase()));
+            const filtered = data.filter(block => favoritedBlocks.includes(block.id));
             setFilteredData(filtered);
         };
 
         filterData();
-    }, [searchText, data]);
+    }, [favoritedBlocks, data]);
+
     useEffect(() => {
         const loadHiddenBlocks = async () => {
             try {
@@ -90,6 +77,7 @@ const ScheduleHeader = () => {
 
         loadHiddenBlocks();
     }, []);
+
     const handleVisibilityToggle = async (id) => {
         setHiddenBlocks(prevState => {
             const isHidden = prevState.includes(id);
@@ -124,6 +112,7 @@ const ScheduleHeader = () => {
             return newState;
         });
     };
+
     const handleDeleteBlock = (id) => {
         setBlockToDeleteId(id);
         setConfirmDeleteModalVisible(true);
@@ -132,17 +121,11 @@ const ScheduleHeader = () => {
     const handleDeleteConfirmed = async () => {
         const blockToDelete = data.find(block => block.id === blockToDeleteId);
         if (!blockToDelete) return;
-    
+
         const updatedData = data.filter(block => block.id !== blockToDeleteId);
         setData(updatedData);
         setConfirmDeleteModalVisible(false);
-    
-        const updatedColunas = colunas.map(coluna => {
-            const updatedFichas = coluna.fichas.filter(ficha => ficha.nome !== blockToDelete.name);
-            return { ...coluna, fichas: updatedFichas };
-        });
-        setColunas(updatedColunas);
-    
+
         // Salvar os blocos atualizados no AsyncStorage
         try {
             await AsyncStorage.setItem('blocks', JSON.stringify(updatedData));
@@ -150,7 +133,6 @@ const ScheduleHeader = () => {
             console.error('Falha ao salvar blocos após exclusão', error);
         }
     };
-
 
     const renderItem = ({ item }) => (
         <View style={[styles.block, { backgroundColor: item.color }]}>
@@ -223,36 +205,24 @@ const ScheduleHeader = () => {
                 </View>
 
                 {/* Renderize o Drawer condicionalmente */}
-                
+              
             </ImageBackground>
             {isDrawerVisible && <Drawer onClose={() => setDrawerVisible(false)} />}
 
             <View style={styles.contentContainer}>
-                <Text style={styles.title2}>Meus Blocos</Text>
-                <Text style={styles.subtitle}>Todos os blocos</Text>
+                <Text style={styles.title2}>Favoritos</Text>
+                <Text style={styles.subtitle}>Meus Favoritos</Text>
                 <FlatList
                     data={filteredData}
                     keyExtractor={(item, index) => index.toString()}
-                    horizontal
+                
+                    numColumns={2}
                     renderItem={renderItem}
                     contentContainerStyle={styles.flatlistContainer}
                 />
-
-                <View style={styles.taskFilterContainer}>
-                    <View style={styles.taskFilterTitleContainer}>
-                        <Text style={styles.taskFilterTitle}>Tarefas feitas</Text>
-                    </View>
-                    <ScrollView style={styles.scrollContainer}>
-                        <View style={styles.colunasContainer}>
-                            {colunas.map((coluna, index) => (
-                                <View key={index} style={styles.tarefasContainer}>
-                                    {coluna.fichas && coluna.fichas.filter(ficha => checkedBlocks.includes(ficha.id)).map((ficha, fichaIndex) => (
-                                        renderFichaItem(ficha)
-                                    ))}
-                                </View>
-                            ))}
-                        </View>
-                    </ScrollView>
+   <View style={styles.taskFilterContainer}>
+                  
+                   
                     <Modal
                         animationType="slide"
                         transparent={true}
@@ -345,6 +315,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#1E90FF',
         textAlign: 'left',
+        left:20,
 
 
     },
@@ -355,18 +326,18 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: 'black',
         marginBottom: 20,
+        left:20,
     },
     flatlistContainer: {
         flexGrow: 1,
-        top: 3,
-        justifyContent: 'start',
+        justifyContent: 'center',
+        left: 20,
     },
     block: {
-        width: 140,
+        width: 140, // Ajuste conforme necessário
         padding: 20,
         borderRadius: 20,
-        marginBottom: 10,
-        marginHorizontal: 10,
+        margin: 10, // Ajuste para espaçamento entre os itens
         height: 130,
         justifyContent: 'space-between',
     },
@@ -375,6 +346,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         alignItems: 'center',
         marginTop: 10,
+        
     },
     iconTouchable: {
         marginHorizontal: 3,
@@ -471,7 +443,7 @@ const styles = StyleSheet.create({
         marginBottom: 3,
         flexDirection: 'row',
         alignItems: 'center',
-        top: -150,
+        top: -130,
     },
     iconContainer: {
         marginRight: 22,
@@ -563,4 +535,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default ScheduleHeader;
+export default Favoritos;

@@ -8,25 +8,27 @@ const Drawer = ({ onClose }) => {
         <View style={styles.drawer}>
             <View style={styles.header}>
                 <Icon name="account-circle" size={65} color="#000" />
-            </View>         
-            <View style={styles.items}></View>      
-            <View style={styles.items}>  
-                <TouchableOpacity onPress={onClose} style={styles.item}>
-                    <Icon name="work" size={25} color="#696969" />
-                    <Text style={styles.itemText}>Área de Trabalho</Text>
-                </TouchableOpacity>
             </View>
-            <View style={styles.items}> 
-                <Link href="/navbar/meusblocos" style={styles.item}>
-                    <Icon name="view-quilt" size={25} color="#696969" />
-                    <Text style={styles.itemText}>Meus Blocos</Text>
+            <View style={styles.items}></View>
+            <View style={styles.items}>
+                <Link href="/blocos/areadtrabalho" style={styles.item}>
+                    <Icon name="work" size={25} color="#696969" />
+                    <Text style={styles.itemText}>Área de trabalho</Text>
                 </Link>
             </View>
             <View style={styles.items}>
-                <Link href="/navbar/favoritos" style={styles.item}>
+                <Link href="/navbar/meusblocos" style={styles.item}>
+                    <Icon name="view-quilt" size={25} color="#696969" />
+                    <Text style={styles.itemText}>Meus blocos</Text>
+                </Link>
+            </View>
+            <View style={styles.items}>
+
+                <TouchableOpacity onPress={onClose} style={styles.item}>
                     <Icon name="favorite" size={25} color="#696969" />
                     <Text style={styles.itemText}>Favoritos</Text>
-                </Link>
+                </TouchableOpacity>
+
             </View>
             <View style={styles.items}>
                 <Link href="/configuracoes" style={styles.item}>
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
         left: 0,
         width: '80%',
         height: '100%',
-        backgroundColor: 'white', 
+        backgroundColor: 'white',
         paddingTop: 50,
         zIndex: 1000,
     },
@@ -87,7 +89,7 @@ const styles = StyleSheet.create({
         marginTop: -10
     },
     itemText: {
-        marginLeft: 10,
+        marginLeft: 0,
         fontSize: 17,
         color: 'gray',
     },

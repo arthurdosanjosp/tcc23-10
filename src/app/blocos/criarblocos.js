@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ImageBackground, Image, Modal, TextInput, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, StatusBar, ImageBackground, Image, Modal, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icons from 'react-native-vector-icons/AntDesign';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home() {
   const [modalVisible, setModalVisible] = useState(false);
   const [blocks, setBlocks] = useState([]);
   const [blockName, setBlockName] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedColor, setSelectedColor] = useState({ color: '', selected: false });
   const router = useRouter();
 
   const handleOpenModal = () => {
@@ -19,20 +20,49 @@ export default function Home() {
     setModalVisible(false);
   };
 
-  const handleCreateBlock = () => {
-    if (blockName && selectedColor) {
-      const newBlocks = [...blocks, { name: blockName, color: selectedColor }];
+  const handleCreateBlock = async () => {
+    if (blockName && selectedColor.color) {
+      const newBlock = { id: blocks.length + 1, name: blockName, color: selectedColor.color };
+      const newBlocks = [...blocks, newBlock];
       setBlocks(newBlocks);
+      await saveBlocks(newBlocks);
       setBlockName('');
-      setSelectedColor('');
+      setSelectedColor({ color: '', selected: false });
       setModalVisible(false);
-      router.push(`/blocos/areadtrabalho?blocks=${encodeURIComponent(JSON.stringify(newBlocks))}`);
+      router.push(`/blocos/areadtrabalho?blocks=${encodeURIComponent(JSON.stringify(newBlocks.map(block => ({ id: block.id, name: block.name, color: block.color }))))}`);
     }
   };
 
   const handleColorSelect = (color) => {
-    setSelectedColor(color);
+    setSelectedColor({ color, selected: true });
   };
+
+  const saveBlocks = async (newBlocks) => {
+    try {
+      await AsyncStorage.setItem('blocks', JSON.stringify(newBlocks));
+    } catch (e) {
+      console.error("Failed to save blocks.", e);
+    }
+  };
+
+  const loadBlocks = async () => {
+    try {
+      const savedBlocks = await AsyncStorage.getItem('blocks');
+      return savedBlocks ? JSON.parse(savedBlocks) : [];
+    } catch (e) {
+      console.error("Failed to load blocks.", e);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const fetchBlocks = async () => {
+      const loadedBlocks = await loadBlocks();
+      setBlocks(loadedBlocks);
+    };
+
+    fetchBlocks();
+  }, []);
 
   return (
     <View>
@@ -75,28 +105,28 @@ export default function Home() {
             <Text style={styles.modald}>Selecione a cor do bloco</Text>
             <View style={styles.colorOptions}>
               <TouchableOpacity onPress={() => handleColorSelect('#4B6D9B')}>
-                <View style={[styles.colorCircle, styles.blue]} />
+                <View style={[styles.colorCircle, styles.blue, selectedColor.color === '#4B6D9B' && { borderWidth: 2, borderColor: 'white' }]} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleColorSelect('#80C49F')}>
-                <View style={[styles.colorCircle, styles.green]} />
+                <View style={[styles.colorCircle, styles.green, selectedColor.color === '#80C49F' && { borderWidth: 2, borderColor: 'white' }]} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleColorSelect('#E8CB73')}>
-                <View style={[styles.colorCircle, styles.yellow]} />
+                <View style={[styles.colorCircle, styles.yellow, selectedColor.color === '#E8CB73' && { borderWidth: 2, borderColor: 'white' }]} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleColorSelect('#CD6051')}>
-                <View style={[styles.colorCircle, styles.red]} />
+                <View style={[styles.colorCircle, styles.red, selectedColor.color === '#CD6051' && { borderWidth: 2, borderColor: 'white' }]} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleColorSelect('#D17BC1')}>
-                <View style={[styles.colorCircle, styles.pink]} />
+                <View style={[styles.colorCircle, styles.pink, selectedColor.color === '#D17BC1' && { borderWidth: 2, borderColor: 'white' }]} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleColorSelect('#8F5EB6')}>
-                <View style={[styles.colorCircle, styles.purple]} />
+                <View style={[styles.colorCircle, styles.purple, selectedColor.color === '#8F5EB6' && { borderWidth: 2, borderColor: 'white' }]} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleColorSelect('#6DCFCF')}>
-                <View style={[styles.colorCircle, styles.cyan]} />
+                <View style={[styles.colorCircle, styles.cyan, selectedColor.color === '#6DCFCF' && { borderWidth: 2, borderColor: 'white' }]} />
               </TouchableOpacity>
               <TouchableOpacity onPress={() => handleColorSelect('#ED942B')}>
-                <View style={[styles.colorCircle, styles.orange]} />
+                <View style={[styles.colorCircle, styles.orange, selectedColor.color === '#ED942B' && { borderWidth: 2, borderColor: 'white' }]} />
               </TouchableOpacity>
             </View>
             <View style={styles.buttonContainer}>
