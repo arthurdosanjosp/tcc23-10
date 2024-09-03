@@ -22,6 +22,12 @@ export default function CriarBloco() {
     const [selectedBlockColor, setSelectedBlockColor] = useState(selectedColor);
     const [editBlockNameModalVisible, setEditBlockNameModalVisible] = useState(false);
     const [newBlockName, setNewBlockName] = useState(blockName);
+    const [editDateModalVisible, setEditDateModalVisible] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(selectedFicha?.date || '');
+    const [movingFicha, setMovingFicha] = useState(null);
+    const [selectedColunaId, setSelectedColunaId] = useState(null);
+
+
 
     const router = useRouter();
 
@@ -114,6 +120,7 @@ export default function CriarBloco() {
         fetchBlockName();
     }, [blockName]);
 
+    // Função para criar as colunas
     const handleCreateColuna = () => {
         if (colunaNome.trim() === '') {
             return;
@@ -125,12 +132,14 @@ export default function CriarBloco() {
         setColunaNome('');
     };
 
+
     const handleCloseModal = () => {
         setModalVisible(false);
         setColunaNome('');
     };
 
-    const handleAddFicha = () => {
+    const handleAddFicha = (colunaId) => {
+        setSelectedColunaId(colunaId);
         setAddFichaModalVisible(true);
     };
 
@@ -148,14 +157,18 @@ export default function CriarBloco() {
             day: 'numeric',
             month: 'short',
         }).replace('.', '');
-
-        const lastColunaIndex = colunas.length - 1;
-        const updatedColunas = [...colunas];
-        updatedColunas[lastColunaIndex].fichas.push({ id: generateUniqueId(), nome: fichaNome, date: formattedDate });
-
+    
+        const updatedColunas = colunas.map(coluna => {
+            if (coluna.id === selectedColunaId) {
+                coluna.fichas.push({ id: generateUniqueId(), nome: fichaNome, date: formattedDate });
+            }
+            return coluna;
+        });
+    
         setColunas(updatedColunas);
         setAddFichaModalVisible(false);
         setFichaNome('');
+        setSelectedColunaId(null); // Resetar o ID da coluna selecionada
     };
 
     const handleOpenFichaModal = async (ficha) => {
@@ -281,6 +294,54 @@ export default function CriarBloco() {
         }
     };
 
+    const handleSaveEditedDate = async () => {
+        if (selectedFicha) {
+            const updatedColunas = [...colunas];
+            const columnIndex = updatedColunas.findIndex(coluna => coluna.fichas.some(f => f.id === selectedFicha.id));
+            if (columnIndex !== -1) {
+                const updatedFichas = updatedColunas[columnIndex].fichas.map(f => {
+                    if (f.id === selectedFicha.id) {
+                        return { ...f, date: selectedDate }; // Atualiza a data
+                    }
+                    return f;
+                });
+                updatedColunas[columnIndex].fichas = updatedFichas;
+                setColunas(updatedColunas);
+
+                await saveColunas(updatedColunas); // Salva as colunas atualizadas no AsyncStorage
+            }
+
+            setEditDateModalVisible(false); // Fecha o modal de edição de data
+            setFichaModalVisible(true); // Reabre o modal da ficha
+        }
+    };
+    const handleEditDate = () => {
+        setFichaModalVisible(false); // Fecha o modal atual
+        setEditDateModalVisible(true); // Abre o modal de edição de data
+    };
+    const moveFichaToColuna = (colunaId) => {
+        if (!movingFicha) return;
+
+        const updatedColunas = colunas.map(coluna => {
+            // Remove a ficha da coluna original
+            coluna.fichas = coluna.fichas.filter(f => f.id !== movingFicha.id);
+            // Adiciona a ficha na coluna de destino
+            if (coluna.id === colunaId) {
+                coluna.fichas.push(movingFicha);
+            }
+            return coluna;
+        });
+
+        setColunas(updatedColunas);
+        setMovingFicha(null); // Resetar a ficha que está sendo movida
+    };
+
+    // Função que é chamada ao segurar a ficha
+    const handleLongPressFicha = (ficha) => {
+        setMovingFicha(ficha);
+    };
+
+
 
     return (
         <View style={{ flex: 1 }}>
@@ -318,7 +379,12 @@ export default function CriarBloco() {
                             </TouchableOpacity>
                         </View>
                         {coluna.fichas && coluna.fichas.map((ficha, fichaIndex) => (
-                            <TouchableOpacity key={fichaIndex} style={styles.fichaContainer} onPress={() => handleOpenFichaModal(ficha)}>
+                            <TouchableOpacity
+                                key={fichaIndex}
+                                style={styles.fichaContainer}
+                                onPress={() => handleOpenFichaModal(ficha)}
+                                onLongPress={() => handleLongPressFicha(ficha)} // Adicionado long press
+                            >
                                 <View style={styles.ficha}>
                                     {editingFichaId === ficha.id ? (
                                         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '94%' }}>
@@ -348,7 +414,12 @@ export default function CriarBloco() {
                                 </View>
                             </TouchableOpacity>
                         ))}
-                        <TouchableOpacity style={styles.addButton} onPress={handleAddFicha}>
+                        {movingFicha && (
+                            <TouchableOpacity style={styles.moveButton} onPress={() => moveFichaToColuna(coluna.id)}>
+                                <Text style={styles.moveButtonText}>Mover para {coluna.nome}</Text>
+                            </TouchableOpacity>
+                        )}
+                        <TouchableOpacity style={styles.addButton} onPress={() => handleAddFicha(coluna.id)}>
                             <Text style={styles.addButtonText}>+ Adicionar Ficha</Text>
                         </TouchableOpacity>
                     </View>
@@ -448,6 +519,9 @@ export default function CriarBloco() {
                                     <Text>Data</Text>
                                     <Text style={styles.timeText}>{selectedFicha ? selectedFicha.date : ''}</Text>
                                 </View>
+                                <TouchableOpacity onPress={handleEditDate}>
+                                    <Text style={styles.editText}>Editar</Text>
+                                </TouchableOpacity>
                                 <View style={styles.deleteButtonContainer}>
                                     <TouchableOpacity onPress={handleDeleteFicha} style={styles.deleteButton}>
                                         <Icon name="delete" size={20} color="red" style={{ marginRight: 10 }} />
@@ -574,6 +648,36 @@ export default function CriarBloco() {
                         </View>
                     </View>
                 </Modal>
+                <Modal
+                    visible={editDateModalVisible}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={() => setEditDateModalVisible(false)}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                        <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setEditDateModalVisible(false)}
+            >
+                <Icon name="close" size={24} color="white" />
+            </TouchableOpacity>
+                            <Text style={styles.modalTitle}>Editar Data</Text>
+                            <TextInput
+                                style={styles.input2}
+                                placeholder="Nova data"
+                                value={selectedDate} // Exibindo a data atual
+                                onChangeText={setSelectedDate} // Atualiza o estado com a nova data
+                            />
+                            <TouchableOpacity
+                                style={styles.saveButton}
+                                onPress={handleSaveEditedDate} // Chama a função para salvar a data
+                            >
+                                <Text style={styles.saveButtonText}>Salvar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
             </ScrollView>
         </View>
 
@@ -640,7 +744,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         color: '#fff',
-        marginBottom: 30,
+        marginBottom: 20,
         textAlign: 'left',
     },
     modalSubtitle: {
@@ -802,7 +906,13 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         backgroundColor: 'white',
         top: 60,
-        right: 82,
+        right: 240,
+    },
+    editText: {
+        marginLeft: 110,
+        color: '#007BFF', // Cor do texto "Editar"
+        fontSize: 12,
+        fontWeight: 'bold',
     },
     deleteButtonTouchable: {
         position: 'absolute',
@@ -817,7 +927,7 @@ const styles = StyleSheet.create({
     },
     saveButton: {
         position: 'absolute',
-        top: 80,  // Ajuste conforme necessário
+        top: 67,  // Ajuste conforme necessário
         right: 22, // Ajuste conforme necessário
         backgroundColor: 'white',
         paddingVertical: 6,
@@ -973,6 +1083,17 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginLeft: 10,
         top: -5,
+    },
+    moveButton: {
+        backgroundColor: '#4B6D9B',
+        padding: 10,
+        borderRadius: 50,
+        marginTop: 7,
+        marginBottom: 10,
+    },
+    moveButtonText: {
+        color: '#fff',
+        textAlign: 'center',
     },
 });
 

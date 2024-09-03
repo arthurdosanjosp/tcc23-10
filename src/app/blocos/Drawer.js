@@ -8,6 +8,10 @@ const Drawer = ({ onClose }) => {
         <View style={styles.drawer}>
             <View style={styles.header}>
                 <Icon name="account-circle" size={65} color="#000" />
+                <View style={styles.userInfo}>
+                    <Text style={styles.userName}>Seu Nome</Text>
+                    <Text style={styles.userEmail}>email@example.com</Text>
+                </View>
             </View>         
             <View style={styles.items}></View>      
             <View style={styles.items}>  
@@ -29,7 +33,7 @@ const Drawer = ({ onClose }) => {
                 </Link>
             </View>
             <View style={styles.items}>
-                <Link href="/configuracoes" style={styles.item}>
+                <Link href="/navbar/configuracoes" style={styles.item}>
                     <Icon name="settings" size={25} color="#696969" />
                     <Text style={styles.itemText}>Configurações</Text>
                 </Link>
@@ -62,17 +66,21 @@ const styles = StyleSheet.create({
         zIndex: 1000,
     },
     header: {
-        alignItems: 'flex-start',
+        flexDirection: 'row',
+        alignItems: 'center',
         marginBottom: 20,
         marginLeft: 20,
     },
-    name: {
-        fontSize: 20,
+    userInfo: {
+        marginLeft: 15,
+    },
+    userName: {
+        fontSize: 18,
         fontWeight: 'bold',
     },
-    email: {
+    userEmail: {
         fontSize: 14,
-        color: '#888',
+        color: 'gray',
     },
     items: {
         paddingHorizontal: 20,
@@ -94,3 +102,4 @@ const styles = StyleSheet.create({
 });
 
 export default Drawer;
+

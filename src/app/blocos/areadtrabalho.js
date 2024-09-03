@@ -101,6 +101,9 @@ export default function Areadtrabalho() {
     const [favoritedBlocks, setFavoritedBlocks] = useState([]);
     const [checkedBlocks, setCheckedBlocks] = useState([]);
     const [hiddenBlocks, setHiddenBlocks] = useState([]);
+    const [editDateModalVisible, setEditDateModalVisible] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(selectedFicha?.date || '');
+    
 
     const router = useRouter();
 
@@ -128,16 +131,12 @@ export default function Areadtrabalho() {
             try {
                 const savedBlocks = await AsyncStorage.getItem('blocks');
                 if (savedBlocks !== null) {
-                    const blocks = JSON.parse(savedBlocks);
-                    for (const block of blocks) {
-                        block.color = await loadBlockColor(block.name); // Carregar cor do bloco
-                    }
-                    setData(blocks);
+                    setData(JSON.parse(savedBlocks));
                 }
             } catch (error) {
                 console.error('Falha ao carregar blocos', error);
             }
-        };  
+        };
 
         loadBlocks();
     }, []);
@@ -378,6 +377,31 @@ export default function Areadtrabalho() {
                 return [...prevState, id];
             }
         });
+    };
+    const handleSaveEditedDate = async () => {
+        if (selectedFicha) {
+            const updatedColunas = [...colunas];
+            const columnIndex = updatedColunas.findIndex(coluna => coluna.fichas.some(f => f.id === selectedFicha.id));
+            if (columnIndex !== -1) {
+                const updatedFichas = updatedColunas[columnIndex].fichas.map(f => {
+                    if (f.id === selectedFicha.id) {
+                        return { ...f, date: selectedDate }; // Atualiza a data
+                    }
+                    return f;
+                });
+                updatedColunas[columnIndex].fichas = updatedFichas;
+                setColunas(updatedColunas);
+
+                await saveColunas(updatedColunas); // Salva as colunas atualizadas no AsyncStorage
+            }
+
+            setEditDateModalVisible(false); // Fecha o modal de edição de data
+            setFichaModalVisible(true); // Reabre o modal da ficha
+        }
+    };
+    const handleEditDate = () => {
+        setFichaModalVisible(false); // Fecha o modal atual
+        setEditDateModalVisible(true); // Abre o modal de edição de data
     };
   
     const renderItem = ({ item }) => (
@@ -627,7 +651,7 @@ export default function Areadtrabalho() {
                                     <View style={styles.modalHeader}>
                                         <Text style={styles.modalTitle}>{selectedFicha ? selectedFicha.nome : 'Detalhes da Ficha'}</Text>
                                         <TouchableOpacity style={styles.closeIcon} onPress={handleCloseFichaModal}>
-                                            <Icon name="close" size={24} color="#fff" />
+                                            <Icon name="close" size={24} color="#fff"  style={styles.closeIcon} />
                                         </TouchableOpacity>
                                     </View>
                                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -654,6 +678,9 @@ export default function Areadtrabalho() {
                                             <Text>Data</Text>
                                             <Text style={styles.timeText}>{selectedFicha ? selectedFicha.date : ''}</Text>
                                         </View>
+                                          <TouchableOpacity onPress={handleEditDate}>
+                                    <Text style={styles.editText}>Editar</Text>
+                                </TouchableOpacity>
                                         <View style={styles.deleteButtonContainer}>
                                             <TouchableOpacity onPress={handleDeleteFicha} style={styles.deleteButton}>
                                                 <Icon name="delete" size={20} color="red" style={{ marginRight: 10 }} />
@@ -664,6 +691,36 @@ export default function Areadtrabalho() {
                                 </View>
                             </View>
                         </Modal>
+                        <Modal
+    visible={editDateModalVisible}
+    transparent={true}
+    animationType="slide"
+    onRequestClose={() => setEditDateModalVisible(false)}
+>
+    <View style={styles.modalOverlay}>
+        <View style={styles.modalContent}>
+            <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setEditDateModalVisible(false)}
+            >
+                <Icon name="close" size={24} color="white" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Editar Data</Text>
+            <TextInput
+                style={styles.input}
+                placeholder="Nova data"
+                value={selectedDate} // Exibindo a data atual
+                onChangeText={setSelectedDate} // Atualiza o estado com a nova data
+            />
+            <TouchableOpacity
+                style={styles.saveButton}
+                onPress={handleSaveEditedDate} // Chama a função para salvar a data
+            >
+                <Text style={styles.saveButtonText}>Salvar</Text>
+            </TouchableOpacity>
+        </View>
+    </View>
+</Modal>
                     </ScrollView>
                 </View>
             </View>
@@ -875,6 +932,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         marginBottom: 10,
         textAlign: 'left',
+        top: 5,
     },
     colorOptions: {
         flexDirection: 'row',
@@ -972,7 +1030,7 @@ const styles = StyleSheet.create({
         marginBottom: 3,
         flexDirection: 'row',
         alignItems: 'center',
-        top: -160,
+        top: '-170%',
     },
     iconContainer: {
         marginRight: 22,
@@ -1043,7 +1101,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         backgroundColor: 'white',
         top: 60,
-        right: 82,
+        right: 250,
     },
     deleteButtonTouchable: {
         position: 'absolute',
@@ -1058,7 +1116,7 @@ const styles = StyleSheet.create({
     },
     saveButton: {
         position: 'absolute',
-        top: 60,  // Ajuste conforme necessário
+        top: 55,  // Ajuste conforme necessário
         right: 22, // Ajuste conforme necessário
         backgroundColor: 'white',
         paddingVertical: 6,
@@ -1078,6 +1136,14 @@ const styles = StyleSheet.create({
     checkboxContainer: {
         paddingLeft: 12,
     },
-
+    editText: {
+        marginLeft: 110,
+        color: '#007BFF', // Cor do texto "Editar"
+        fontSize: 12,
+        fontWeight: 'bold',
+    },
+    closeIcon: {
+       top: -5,
+    },
 
 });

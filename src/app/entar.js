@@ -1,36 +1,75 @@
-import React from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, Pressable, Image, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./config/firebaseConfig";
 import Icon from 'react-native-vector-icons/AntDesign';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 const EntrarScreen = () => {
+    const [email, setEmail] = useState('');
+    const [senha, setSenha] = useState('');
+    const router = useRouter();
+
+    const logar = () => {
+        if (email.trim() === '' || senha.trim() === '') {
+            return Alert.alert('Por favor, preencha todos os campos.');
+        }
+
+        signInWithEmailAndPassword(auth, email, senha)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log('Usuário logado:', user);
+                setTimeout(() => {
+                    router.push('/blocos/criarblocos');
+                }, 100); 
+            })
+            .catch((error) => {
+                console.error(error);
+                Alert.alert('Erro ao fazer login', error.message);
+            });
+    };
+
     return (
-        <View style={styles.container}>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={60}  // Ajuste conforme necessário
+        >
+            <Pressable style={styles.backButton} onPress={() => router.back()}>
+                <Icon name="arrowleft" size={30} color="black" />
+            </Pressable>
             <Image style={styles.imageTop} source={require('./img/bola3.jpeg')} />
             <Text style={styles.forgotPasswordText}></Text>
             <Text style={styles.title}>Entrar</Text>
             <Text style={styles.welcomeText}>Bem-Vindo de Volta!</Text>
             <Image style={styles.imageBottom} source={require('./img/bola2.jpeg')} />
-            
+
             <View style={styles.inputContainer}>
                 <Icon name='mail' size={25} color='gray'/>
-                <TextInput style={styles.input} placeholder="Email" keyboardType="email-address" />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    keyboardType="email-address"
+                    onChangeText={text => setEmail(text)} 
+                />
             </View>
             <View style={styles.inputContainer}>
                 <Icon name='lock' size={25} color='gray'/>
-                <TextInput style={styles.input} placeholder="Senha" secureTextEntry={true} />
+                <TextInput
+                    style={styles.input}
+                    placeholder="Senha"
+                    secureTextEntry={true}
+                    onChangeText={text => setSenha(text)} 
+                />
             </View>
-                  
-            <Text style={styles.forgotPasswordText}>Esqueci senha</Text>
+
+            <Text style={styles.forgotPasswordText}></Text>
             <View style={styles.buttonContainer}>
-                <Link href="/blocos/criarblocos" asChild>
-                    <TouchableOpacity style={styles.button} onPress={() => console.log('Entrar')}>
-                        <Text style={styles.buttonText}>ENTRAR</Text>
-                    </TouchableOpacity>
-                </Link>
+                <Pressable onPress={logar} style={styles.button}>
+                    <Text style={styles.buttonText}>ENTRAR</Text>
+                </Pressable>
             </View>
-          
-        </View>
+        </KeyboardAvoidingView>
     );
 };
 
@@ -39,6 +78,12 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 10,
+        left: 20,
+        zIndex: 1,
     },
     title: {
         fontSize: 69,
@@ -79,7 +124,7 @@ const styles = StyleSheet.create({
         color: '#0000CD',
         marginTop: 10,
         textDecorationLine: 'underline',
-        marginBottom: 80,
+        marginBottom: 60,
     },
     buttonContainer: {
         flexDirection: 'column',
