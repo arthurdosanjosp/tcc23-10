@@ -237,6 +237,8 @@ const ScheduleHeader = () => {
                     renderItem={renderItem}
                     contentContainerStyle={styles.flatlistContainer}
                 />
+                </View>
+                
 
                 <View style={styles.taskFilterContainer}>
                     <View style={styles.taskFilterTitleContainer}>
@@ -275,7 +277,7 @@ const ScheduleHeader = () => {
                         </View>
                     </Modal>
                 </View>
-            </View>
+           
         </>
     );
 };
@@ -291,6 +293,7 @@ const styles = StyleSheet.create({
         top: -49,
         paddingTop: StatusBar.currentHeight || 20,
     },
+    
     navTop: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -385,7 +388,7 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     taskFilterContainer: {
-        marginTop: 20,
+        marginTop: 5,
         paddingHorizontal: 20,
     },
     taskFilterTitleContainer: {
@@ -397,7 +400,7 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: 'bold',
         color: '#333',
-        right: 17,
+        left: 5,
         marginBottom: 20,
     },
     taskFilterButtons: {
@@ -471,7 +474,10 @@ const styles = StyleSheet.create({
         marginBottom: 3,
         flexDirection: 'row',
         alignItems: 'center',
-        top: -150,
+        top: '-160%',
+        marginTop: '-1%',
+        width: '90%',
+        left: 15,
     },
     iconContainer: {
         marginRight: 22,

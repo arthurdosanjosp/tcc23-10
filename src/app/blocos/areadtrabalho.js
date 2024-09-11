@@ -480,6 +480,7 @@ export default function Areadtrabalho() {
                     renderItem={renderItem}
                     contentContainerStyle={styles.flatlistContainer}
                 />
+                </View>
                 
 
                 {/* Minhas Tarefas Section */}
@@ -530,6 +531,7 @@ export default function Areadtrabalho() {
                                 </View>
                             ))}
                         </View>
+                        </ScrollView>
 
 
                         {/* Modal de Criar Bloco */}
@@ -721,10 +723,10 @@ export default function Areadtrabalho() {
         </View>
     </View>
 </Modal>
-                    </ScrollView>
+                   
                 </View>
             </View>
-        </View>
+      
 
     );
 }
@@ -831,8 +833,8 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     taskFilterContainer: {
-        marginTop: 20,
-        paddingHorizontal: 20,
+        marginTop: -15,
+        paddingHorizontal: 30,
     },
     taskFilterTitleContainer: {
         flexDirection: 'row',
@@ -843,7 +845,8 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: 'bold',
         color: '#333',
-        right: 17,
+        right: 8,
+
     },
     taskFilterButtons: {
         flexDirection: 'row',
@@ -862,7 +865,7 @@ const styles = StyleSheet.create({
     },
     addTaskIcon: {
         paddingVertical: 10,
-        paddingHorizontal: -10,
+        paddingHorizontal: 10,
         left: 10,
     },
     modalOverlay: {
@@ -1031,6 +1034,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         top: '-170%',
+        marginTop: '-1%',
+      
     },
     iconContainer: {
         marginRight: 22,

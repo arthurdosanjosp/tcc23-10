@@ -16,7 +16,7 @@ export default function Config() {
             </ImageBackground>
 
             <View style={styles.profileContainer}>
-                <Icon name="account-circle" size={120} color="#5c6bc0" />
+                <Icon name="account-circle" size={120} color="#4f7bbd" />
                 <View style={styles.profileDetails}>
                     <Text style={styles.profileName}>Helena</Text>
                     <Text style={styles.profileEmail}>helenasilva@gmail.com</Text>
@@ -27,7 +27,7 @@ export default function Config() {
             </View>
 
             <View style={styles.optionsContainer}>
-                <TouchableOpacity style={styles.optionItem} onPress={() => router.push('/alternate-account')}>  
+                <TouchableOpacity style={styles.optionItem} onPress={() => router.push('/conta/alterar')}>  
                     <Icon name="sync-alt" size={40} color="#424242" />
                     <Text style={styles.optionText}>Alternar conta</Text>
                 </TouchableOpacity>
@@ -37,7 +37,7 @@ export default function Config() {
                     <Text style={styles.optionText}>Gerenciar conta</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.optionItem} onPress={() => router.push('/help')}>
+                <TouchableOpacity style={styles.optionItem} onPress={() => router.push('/conta/ajuda')}>
                     <Icon name="help-outline" size={40} color="#424242" />
                     <Text style={styles.optionText}>Ajuda</Text>
                 </TouchableOpacity>
