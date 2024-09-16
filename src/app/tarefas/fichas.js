@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, StatusBar, TextInput, Modal, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TouchableOpacity, StatusBar, TextInput, Modal, ScrollView, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker'; 
+
 
 export default function CriarBloco() {
     const [modalVisible, setModalVisible] = useState(false);
@@ -23,10 +25,11 @@ export default function CriarBloco() {
     const [editBlockNameModalVisible, setEditBlockNameModalVisible] = useState(false);
     const [newBlockName, setNewBlockName] = useState(blockName);
     const [editDateModalVisible, setEditDateModalVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(selectedFicha?.date || '');
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const [movingFicha, setMovingFicha] = useState(null);
     const [selectedColunaId, setSelectedColunaId] = useState(null);
-
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    
 
 
     const router = useRouter();
@@ -294,38 +297,48 @@ export default function CriarBloco() {
         }
     };
 
-    const handleSaveEditedDate = async () => {
-        if (selectedFicha) {
-            const updatedColunas = [...colunas];
-            const columnIndex = updatedColunas.findIndex(coluna => coluna.fichas.some(f => f.id === selectedFicha.id));
-            if (columnIndex !== -1) {
-                const updatedFichas = updatedColunas[columnIndex].fichas.map(f => {
-                    if (f.id === selectedFicha.id) {
-                        return { ...f, date: selectedDate }; // Atualiza a data
-                    }
-                    return f;
-                });
-                updatedColunas[columnIndex].fichas = updatedFichas;
-                setColunas(updatedColunas);
+   const handleSaveEditedDate = async () => {
+    if (selectedFicha && selectedDate instanceof Date) { // Verifica se selectedDate é um objeto Date
+        const updatedColunas = [...colunas];
+        // Encontra o índice da coluna que contém a ficha selecionada
+        const columnIndex = updatedColunas.findIndex(coluna => 
+            coluna.fichas.some(f => f.id === selectedFicha.id)
+        );
 
-                await saveColunas(updatedColunas); // Salva as colunas atualizadas no AsyncStorage
-            }
+        if (columnIndex !== -1) {
+            // Atualiza a data da ficha dentro da coluna encontrada
+            const updatedFichas = updatedColunas[columnIndex].fichas.map(f => {
+                if (f.id === selectedFicha.id) {
+                    return { ...f, date: formatDate(selectedDate) }; // Atualiza a data formatada
+                }
+                return f;
+            });
 
-            setEditDateModalVisible(false); // Fecha o modal de edição de data
-            setFichaModalVisible(true); // Reabre o modal da ficha
+            updatedColunas[columnIndex].fichas = updatedFichas; // Atualiza a lista de fichas na coluna
+            setColunas(updatedColunas); // Atualiza o estado com as novas colunas
+
+            await saveColunas(updatedColunas); // Salva as colunas atualizadas no AsyncStorage
         }
-    };
+
+        alert(`Data salva: ${formatDate(selectedDate)}`); // Exibe a data salva como alerta
+        setEditDateModalVisible(false); 
+        setFichaModalVisible(true);     
+    } else {
+        console.error('selectedDate deve ser um objeto Date');
+    }
+};
     const handleEditDate = () => {
-        setFichaModalVisible(false); // Fecha o modal atual
-        setEditDateModalVisible(true); // Abre o modal de edição de data
+        setFichaModalVisible(false); 
+        setEditDateModalVisible(true);
+        setShowDatePicker(true);
     };
     const moveFichaToColuna = (colunaId) => {
         if (!movingFicha) return;
 
         const updatedColunas = colunas.map(coluna => {
-            // Remove a ficha da coluna original
+            
             coluna.fichas = coluna.fichas.filter(f => f.id !== movingFicha.id);
-            // Adiciona a ficha na coluna de destino
+           
             if (coluna.id === colunaId) {
                 coluna.fichas.push(movingFicha);
             }
@@ -333,14 +346,30 @@ export default function CriarBloco() {
         });
 
         setColunas(updatedColunas);
-        setMovingFicha(null); // Resetar a ficha que está sendo movida
+        setMovingFicha(null); 
     };
 
-    // Função que é chamada ao segurar a ficha
+  
     const handleLongPressFicha = (ficha) => {
         setMovingFicha(ficha);
     };
-
+    const onDateChange = (event, date) => {
+        setShowDatePicker(Platform.OS === 'ios'); 
+        if (date) {
+            setSelectedDate(date);
+        }
+    };
+    const formatDate = (date) => {
+        if (!(date instanceof Date)) {
+            return '';
+        }
+    
+        const day = date.toLocaleDateString('pt-BR', { day: 'numeric' });
+        const month = date.toLocaleDateString('pt-BR', { month: 'short' });
+    
+  
+        return `${day} de ${month.replace('.', '')}`;
+    };
 
 
     return (
@@ -649,35 +678,46 @@ export default function CriarBloco() {
                     </View>
                 </Modal>
                 <Modal
-                    visible={editDateModalVisible}
-                    transparent={true}
-                    animationType="slide"
-                    onRequestClose={() => setEditDateModalVisible(false)}
-                >
-                    <View style={styles.modalOverlay}>
-                        <View style={styles.modalContent}>
-                        <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setEditDateModalVisible(false)}
-            >
-                <Icon name="close" size={24} color="white" />
-            </TouchableOpacity>
-                            <Text style={styles.modalTitle}>Editar Data</Text>
-                            <TextInput
-                                style={styles.input2}
-                                placeholder="Nova data"
-                                value={selectedDate} // Exibindo a data atual
-                                onChangeText={setSelectedDate} // Atualiza o estado com a nova data
-                            />
-                            <TouchableOpacity
-                                style={styles.saveButton}
-                                onPress={handleSaveEditedDate} // Chama a função para salvar a data
-                            >
-                                <Text style={styles.saveButtonText}>Salvar</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </Modal>
+            visible={editDateModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setEditDateModalVisible(false)}
+        >
+            <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                    <TouchableOpacity
+                        style={styles.closeButton}
+                        onPress={() => setEditDateModalVisible(false)}
+                    >
+                        <Icon name="close" size={24} color="white" />
+                    </TouchableOpacity>
+                    <Text style={styles.modalTitle}>Editar Data</Text>
+
+                    {/* Botão para abrir o calendário */}
+                    <TouchableOpacity onPress={handleEditDate}>
+                        <Text style={styles.dateButtonText}>
+                            {formatDate(selectedDate)} {/* Exibe a data formatada */}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={selectedDate}
+                            mode="date"
+                            display="default"
+                            onChange={onDateChange} // Função chamada ao alterar a data
+                        />
+                    )}
+
+                    <TouchableOpacity
+                        style={styles.saveButton}
+                        onPress={handleSaveEditedDate} // Chama a função para salvar a data
+                    >
+                        <Text style={styles.saveButtonText}>Salvar</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
             </ScrollView>
         </View>
 
@@ -873,7 +913,8 @@ const styles = StyleSheet.create({
     closeIcon: {
         padding: 10,
         top: -13,
-        left: '280%'
+        left: '470%',
+        marginLeft: 1,
     },
     inputWithIcon: {
         flexDirection: 'row',
@@ -1095,5 +1136,9 @@ const styles = StyleSheet.create({
         color: '#fff',
         textAlign: 'center',
     },
+    dateButtonText:{
+        color: 'white',
+        fontSize: 18,
+    }
 });
 

@@ -16,7 +16,9 @@ export default function Config() {
             </ImageBackground>
 
             <View style={styles.profileContainer}>
-                <Icon name="account-circle" size={120} color="#4f7bbd" />
+                <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>H</Text>
+                </View>
                 <View style={styles.profileDetails}>
                     <Text style={styles.profileName}>Helena</Text>
                     <Text style={styles.profileEmail}>helenasilva@gmail.com</Text>
@@ -80,6 +82,7 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         paddingHorizontal: 15,
         top: -15,
+        marginLeft: 20,
     },
     profileDetails: {
         marginLeft: 15, // Add space between the circle icon and text
@@ -116,5 +119,19 @@ const styles = StyleSheet.create({
         fontSize: 22, // Increase font size
         marginLeft: 20, // Increase space between icon and text
         color: '#424242',
+    },
+    avatar: {
+        width: 95,
+        height: 95,
+        borderRadius: 70,
+        backgroundColor: '#6699CC',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 10,
+    },
+    avatarText: {
+        color: 'white',
+        fontSize: 30,
+        fontWeight: 'bold',
     },
 });

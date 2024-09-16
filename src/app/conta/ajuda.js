@@ -31,7 +31,7 @@ export default function AjudaScreen() {
           <View style={styles.section}>
             <Text style={styles.title}>Comunidade</Text>
             <Text style={styles.subtitle}>Perguntas e respostas feitas pelos usuários</Text>
-            <TouchableOpacity style={styles.button} onPress={() => router.push('/comunidade')}>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/comunidade/comunidade')}>
               <Text style={styles.buttonText}>Visualizar</Text>
             </TouchableOpacity>
           </View>
@@ -39,7 +39,7 @@ export default function AjudaScreen() {
           <View style={styles.section}>
             <Text style={styles.title}>Suporte</Text>
             <Text style={styles.subtitle}>Algum problema? Nos contate!</Text>
-            <TouchableOpacity style={styles.button} onPress={() => router.push('/suporte')}>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/comunidade/suporte')}>
               <Text style={styles.buttonText}>Visualizar</Text>
             </TouchableOpacity>
           </View>

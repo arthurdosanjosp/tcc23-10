@@ -24,7 +24,7 @@ const PerguntasFrequentes = () => {
 
   return (
     <ImageBackground 
-    source={require('../img/gradient (6).jpeg')} // Substitua pelo caminho correto da sua imagem
+    source={require('../img/gradient (6).jpeg')} 
     style={styles.backgroundImage}
   >
     <View style={styles.container}>
@@ -33,7 +33,7 @@ const PerguntasFrequentes = () => {
           name="arrow-back" 
           size={26} 
           color="white" 
-          onPress={() => router.back()} // Usando o router para voltar à tela anterior
+          onPress={() => router.back()} 
         />
         <Text style={styles.title}>Perguntas frequentes</Text>
       </View>
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     color: '#333',
-    textAlign: 'center',
+    textAlign: 'left',
   },
 });
 

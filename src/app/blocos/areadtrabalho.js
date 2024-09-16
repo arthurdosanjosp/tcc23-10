@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ImageBackground, TouchableOpacity, StatusBar, TextInput, Modal, ScrollView, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ImageBackground, TouchableOpacity, StatusBar, TextInput, Modal, ScrollView, Alert, Platform} from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Drawer from './Drawer';
+import DateTimePicker from '@react-native-community/datetimepicker'; 
 const saveColunas = async (colunas) => {
     try {
         await AsyncStorage.setItem('colunas', JSON.stringify(colunas));
@@ -81,6 +82,8 @@ const loadBlockColor = async (blockName) => {
     }
 };
 
+
+
 export default function Areadtrabalho() {
     const [data, setData] = useState([]);
     const [filteredData, setFilteredData] = useState([]);
@@ -102,8 +105,12 @@ export default function Areadtrabalho() {
     const [checkedBlocks, setCheckedBlocks] = useState([]);
     const [hiddenBlocks, setHiddenBlocks] = useState([]);
     const [editDateModalVisible, setEditDateModalVisible] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(selectedFicha?.date || '');
-    
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [selectedColunaId, setSelectedColunaId] = useState(null);
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [movingFicha, setMovingFicha] = useState(null);
+    const [filteredFichas, setFilteredFichas] = useState([]);
+    const [filterOption, setFilterOption] = useState('Hoje');
 
     const router = useRouter();
 
@@ -379,30 +386,79 @@ export default function Areadtrabalho() {
         });
     };
     const handleSaveEditedDate = async () => {
-        if (selectedFicha) {
+        if (selectedFicha && selectedDate instanceof Date) { // Verifica se selectedDate é um objeto Date
             const updatedColunas = [...colunas];
-            const columnIndex = updatedColunas.findIndex(coluna => coluna.fichas.some(f => f.id === selectedFicha.id));
+            // Encontra o índice da coluna que contém a ficha selecionada
+            const columnIndex = updatedColunas.findIndex(coluna => 
+                coluna.fichas.some(f => f.id === selectedFicha.id)
+            );
+    
             if (columnIndex !== -1) {
+                // Atualiza a data da ficha dentro da coluna encontrada
                 const updatedFichas = updatedColunas[columnIndex].fichas.map(f => {
                     if (f.id === selectedFicha.id) {
-                        return { ...f, date: selectedDate }; // Atualiza a data
+                        return { ...f, date: formatDate(selectedDate) }; // Atualiza a data formatada
                     }
                     return f;
                 });
-                updatedColunas[columnIndex].fichas = updatedFichas;
-                setColunas(updatedColunas);
-
+    
+                updatedColunas[columnIndex].fichas = updatedFichas; // Atualiza a lista de fichas na coluna
+                setColunas(updatedColunas); // Atualiza o estado com as novas colunas
+    
                 await saveColunas(updatedColunas); // Salva as colunas atualizadas no AsyncStorage
             }
-
-            setEditDateModalVisible(false); // Fecha o modal de edição de data
-            setFichaModalVisible(true); // Reabre o modal da ficha
+    
+            alert(`Data salva: ${formatDate(selectedDate)}`); // Exibe a data salva como alerta
+            setEditDateModalVisible(false); 
+            setFichaModalVisible(true);     
+        } else {
+            console.error('selectedDate deve ser um objeto Date');
         }
     };
-    const handleEditDate = () => {
-        setFichaModalVisible(false); // Fecha o modal atual
-        setEditDateModalVisible(true); // Abre o modal de edição de data
-    };
+        const handleEditDate = () => {
+            setFichaModalVisible(false); 
+            setEditDateModalVisible(true);
+            setShowDatePicker(true);
+        };
+        const moveFichaToColuna = (colunaId) => {
+            if (!movingFicha) return;
+    
+            const updatedColunas = colunas.map(coluna => {
+                
+                coluna.fichas = coluna.fichas.filter(f => f.id !== movingFicha.id);
+               
+                if (coluna.id === colunaId) {
+                    coluna.fichas.push(movingFicha);
+                }
+                return coluna;
+            });
+    
+            setColunas(updatedColunas);
+            setMovingFicha(null); 
+        };
+    
+      
+        const handleLongPressFicha = (ficha) => {
+            setMovingFicha(ficha);
+        };
+        const onDateChange = (event, date) => {
+            setShowDatePicker(Platform.OS === 'ios'); 
+            if (date) {
+                setSelectedDate(date);
+            }
+        };
+        const formatDate = (date) => {
+            if (!(date instanceof Date)) {
+                return '';
+            }
+        
+            const day = date.toLocaleDateString('pt-BR', { day: 'numeric' });
+            const month = date.toLocaleDateString('pt-BR', { month: 'short' });
+        
+      
+            return `${day} de ${month.replace('.', '')}`;
+        };
+    
   
     const renderItem = ({ item }) => (
         // Se o bloco estiver na lista de blocos ocultos, não renderize ele
@@ -694,35 +750,46 @@ export default function Areadtrabalho() {
                             </View>
                         </Modal>
                         <Modal
-    visible={editDateModalVisible}
-    transparent={true}
-    animationType="slide"
-    onRequestClose={() => setEditDateModalVisible(false)}
->
-    <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
-            <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setEditDateModalVisible(false)}
-            >
-                <Icon name="close" size={24} color="white" />
-            </TouchableOpacity>
-            <Text style={styles.modalTitle}>Editar Data</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Nova data"
-                value={selectedDate} // Exibindo a data atual
-                onChangeText={setSelectedDate} // Atualiza o estado com a nova data
-            />
-            <TouchableOpacity
-                style={styles.saveButton}
-                onPress={handleSaveEditedDate} // Chama a função para salvar a data
-            >
-                <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity>
-        </View>
-    </View>
-</Modal>
+            visible={editDateModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={() => setEditDateModalVisible(false)}
+        >
+            <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                    <TouchableOpacity
+                        style={styles.closeButton}
+                        onPress={() => setEditDateModalVisible(false)}
+                    >
+                        <Icon name="close" size={24} color="white" />
+                    </TouchableOpacity>
+                    <Text style={styles.modalTitle}>Editar Data</Text>
+
+                    {/* Botão para abrir o calendário */}
+                    <TouchableOpacity onPress={handleEditDate}>
+                        <Text style={styles.dateButtonText}>
+                            {formatDate(selectedDate)} {/* Exibe a data formatada */}
+                        </Text>
+                    </TouchableOpacity>
+
+                    {showDatePicker && (
+                        <DateTimePicker
+                            value={selectedDate}
+                            mode="date"
+                            display="default"
+                            onChange={onDateChange} // Função chamada ao alterar a data
+                        />
+                    )}
+
+                    <TouchableOpacity
+                        style={styles.saveButton}
+                        onPress={handleSaveEditedDate} // Chama a função para salvar a data
+                    >
+                        <Text style={styles.saveButtonText}>Salvar</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
+        </Modal>
                    
                 </View>
             </View>
@@ -1150,5 +1217,8 @@ const styles = StyleSheet.create({
     closeIcon: {
        top: -5,
     },
-
+    dateButtonText:{
+        color:'white',
+        fontSize: 18
+    }
 });

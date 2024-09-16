@@ -4,8 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 
 const AccountScreen = () => {
-  
-const router = useRouter(); 
+  const router = useRouter(); 
   const [isEditing, setIsEditing] = useState({
     fullName: false,
     publicName: false,
@@ -41,7 +40,7 @@ const router = useRouter();
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-      <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity onPress={() => router.back()}>
           <Icon name="arrow-back" size={32} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Gerenciar Conta</Text>
@@ -49,13 +48,8 @@ const router = useRouter();
 
       {/* User Info */}
       <View style={styles.userInfo}>
-        <View>
-          {/* Ícone de conta principal */}
-          <Icon name="account-circle" size={80} color="#4f7bbd" />
-          {/* Ícone de câmera pequeno e clicável */}
-          <TouchableOpacity style={styles.cameraIconContainer}>
-            <Icon name="camera-alt" size={20} color="gray" />
-          </TouchableOpacity>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>H</Text>
         </View>
         <View style={styles.userDetails}>
           <Text style={styles.userName}>{values.publicName}</Text>
@@ -179,8 +173,22 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     marginBottom: 24,
   },
+  avatar: {
+    width: 65,
+    height: 65,
+    borderRadius: 50,
+    backgroundColor: '#6699CC',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  avatarText: {
+    color: 'white',
+    fontSize: 26,
+    fontWeight: 'bold',
+  },
   userDetails: {
-    marginLeft: 20,
+    flex: 1,
   },
   userName: {
     fontSize: 20,
@@ -189,14 +197,6 @@ const styles = StyleSheet.create({
   userEmail: {
     color: '#4f7bbd',
     marginTop: 4,
-  },
-  cameraIconContainer: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 4,
   },
   section: {
     backgroundColor: '#f4f4f4',
