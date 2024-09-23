@@ -29,6 +29,9 @@ export default function CriarBloco() {
     const [movingFicha, setMovingFicha] = useState(null);
     const [selectedColunaId, setSelectedColunaId] = useState(null);
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const [deleteColunaModalVisible, setDeleteColunaModalVisible] = useState(false);
+const [colunaToDelete, setColunaToDelete] = useState(null);
+
     
 
 
@@ -212,12 +215,21 @@ export default function CriarBloco() {
     };
 
     const handleDeleteColuna = async (index) => {
-        const updatedColunas = [...colunas];
-        updatedColunas.splice(index, 1); // Remove a coluna do array de colunas
-        setColunas(updatedColunas); // Atualiza o estado com as colunas atualizadas
-
-        // Salvar atualização no AsyncStorage
-        await saveColunas(updatedColunas);
+        setColunaToDelete(index);
+        setDeleteColunaModalVisible(true);
+       
+    };
+    const confirmDeleteColuna = async () => {
+        if (colunaToDelete !== null) {
+            const updatedColunas = [...colunas];
+            updatedColunas.splice(colunaToDelete, 1); // Remove a coluna
+            setColunas(updatedColunas); // Atualiza o estado com as colunas atualizadas
+    
+            await saveColunas(updatedColunas); // Salva a mudança no AsyncStorage
+    
+            setDeleteColunaModalVisible(false); // Fecha o modal de confirmação
+            setColunaToDelete(null); // Reseta a coluna a ser deletada
+        }
     };
 
     const handleEditFicha = (ficha) => {
@@ -404,8 +416,9 @@ export default function CriarBloco() {
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                             <Text style={styles.tarefasTitle}>{coluna.nome}</Text>
                             <TouchableOpacity onPress={() => handleDeleteColuna(index)}>
-                                <Icon name="delete" size={17} color="red" />
-                            </TouchableOpacity>
+    <Icon name="delete" size={17} color="red" />
+</TouchableOpacity>
+
                         </View>
                         {coluna.fichas && coluna.fichas.map((ficha, fichaIndex) => (
                             <TouchableOpacity
@@ -718,6 +731,34 @@ export default function CriarBloco() {
                 </View>
             </View>
         </Modal>
+        <Modal
+    visible={deleteColunaModalVisible}
+    transparent={true}
+    animationType="slide"
+    onRequestClose={() => setDeleteColunaModalVisible(false)}
+>
+<View style={styles.modalOverlay}>
+<View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Tem certeza que deseja excluir esta coluna?</Text>
+            <View style={styles.buttonContainer}>
+               
+                <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => setDeleteColunaModalVisible(false)}
+                >
+                    <Text style={styles.cancelButtonText}>Não</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.createButton}
+                    onPress={confirmDeleteColuna}
+                >
+                    <Text style={styles.createButtonText}>Sim</Text>
+                </TouchableOpacity>
+            </View>
+        </View>
+    </View>
+</Modal>
+
             </ScrollView>
         </View>
 
@@ -912,9 +953,9 @@ const styles = StyleSheet.create({
     },
     closeIcon: {
         padding: 10,
-        top: -13,
-        left: '470%',
-        marginLeft: 1,
+        top: -13, 
+        
+       marginLeft: 20,
     },
     inputWithIcon: {
         flexDirection: 'row',

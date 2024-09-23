@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ImageBackground, StyleSheet, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router'; 
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebaseConfig'; 
 
 export default function Config() {
     const router = useRouter();
+    const [userData, setUserData] = useState({
+        name: '',
+        email: '',
+    });
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    const userDocRef = doc(db, 'usuarios', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    if (userDoc.exists()) {
+                        setUserData(userDoc.data());
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao recuperar dados do usuário:', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -16,12 +41,10 @@ export default function Config() {
             </ImageBackground>
 
             <View style={styles.profileContainer}>
-                <View style={styles.avatar}>
-                    <Text style={styles.avatarText}>H</Text>
-                </View>
+                <Icon name="account-circle" size={120} color="#5c6bc0" />
                 <View style={styles.profileDetails}>
-                    <Text style={styles.profileName}>Helena</Text>
-                    <Text style={styles.profileEmail}>helenasilva@gmail.com</Text>
+                    <Text style={styles.profileName}>{userData.name || 'Nome Completo'}</Text>
+                    <Text style={styles.profileEmail}>{userData.email || 'Email'}</Text>
                     <TouchableOpacity onPress={() => router.push('/conta/gerenciar')}>
                         <Text style={styles.editText}>Editar</Text>
                     </TouchableOpacity>
@@ -77,15 +100,14 @@ const styles = StyleSheet.create({
         marginLeft: 5,
     },
     profileContainer: {
-        flexDirection: 'row', // Align the circle and details horizontally
+        flexDirection: 'row',
         alignItems: 'center',
         marginVertical: 20,
         paddingHorizontal: 15,
         top: -15,
-        marginLeft: 20,
     },
     profileDetails: {
-        marginLeft: 15, // Add space between the circle icon and text
+        marginLeft: 15,
     },
     profileName: {
         fontSize: 24,
@@ -111,27 +133,13 @@ const styles = StyleSheet.create({
     optionItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 20, // Increase padding for larger touch area
+        paddingVertical: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#e0e0e0',
     },
     optionText: {
-        fontSize: 22, // Increase font size
-        marginLeft: 20, // Increase space between icon and text
+        fontSize: 22,
+        marginLeft: 20,
         color: '#424242',
-    },
-    avatar: {
-        width: 95,
-        height: 95,
-        borderRadius: 70,
-        backgroundColor: '#6699CC',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 10,
-    },
-    avatarText: {
-        color: 'white',
-        fontSize: 30,
-        fontWeight: 'bold',
     },
 });

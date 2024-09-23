@@ -1,26 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebaseConfig'; 
 
 const AccountScreen = () => {
-  const router = useRouter(); 
-  const [isEditing, setIsEditing] = useState({
-    fullName: false,
-    publicName: false,
-    email: false,
-    password: false,
-  });
-
-  // Gerenciar os valores dos campos
+  const router = useRouter();
   const [values, setValues] = useState({
-    fullName: 'Helena da Silva',
-    publicName: 'Helena',
-    email: 'helenasilva@gmail.com',
-    password: '•••••••••',
+    name: '',
+    name:'',
+    email: '',
+    senha: '',
+  });
+  const [isEditing, setIsEditing] = useState({
   });
 
-  // Função para alternar o modo de edição
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userDocRef = doc(db, 'usuarios', user.uid); 
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setValues(userDoc.data());
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao recuperar dados do usuário:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const toggleEdit = (field) => {
     setIsEditing((prev) => ({
       ...prev,
@@ -28,12 +42,27 @@ const AccountScreen = () => {
     }));
   };
 
-  // Função para atualizar os valores
   const handleChange = (field, text) => {
     setValues((prev) => ({
       ...prev,
       [field]: text,
     }));
+  };
+
+  const updateUserData = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userDocRef = doc(db, 'usuarios', user.uid); 
+        await updateDoc(userDocRef, {
+          name: values.name,
+          email: values.email,
+          password: values.senha, 
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar dados do usuário:', error);
+    }
   };
 
   return (
@@ -48,11 +77,16 @@ const AccountScreen = () => {
 
       {/* User Info */}
       <View style={styles.userInfo}>
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>H</Text>
+        <View>
+          {/* Ícone de conta principal */}
+          <Icon name="account-circle" size={80} color="#4f7bbd" />
+          {/* Ícone de câmera pequeno e clicável */}
+          <TouchableOpacity style={styles.cameraIconContainer}>
+            <Icon name="camera-alt" size={20} color="gray" />
+          </TouchableOpacity>
         </View>
         <View style={styles.userDetails}>
-          <Text style={styles.userName}>{values.publicName}</Text>
+          <Text style={styles.userName}>{values.name}</Text>
           <Text style={styles.userEmail}>{values.email}</Text>
         </View>
       </View>
@@ -65,18 +99,21 @@ const AccountScreen = () => {
         <View style={styles.infoRow}>
           <View style={styles.infoTextContainer}>
             <Text style={styles.infoLabel}>Nome Completo</Text>
-            {isEditing.fullName ? (
+            {isEditing.name ? (
               <TextInput
                 style={styles.input}
-                value={values.fullName}
-                onChangeText={(text) => handleChange('fullName', text)}
-                onBlur={() => toggleEdit('fullName')} // Sair do modo de edição ao perder o foco
+                value={values.name}
+                onChangeText={(text) => handleChange('name', text)}
+                onBlur={() => {
+                  toggleEdit('name');
+                  updateUserData();
+                }}
               />
             ) : (
-              <Text style={styles.infoValue}>{values.fullName}</Text>
+              <Text style={styles.infoValue}>{values.name}</Text>
             )}
           </View>
-          <TouchableOpacity onPress={() => toggleEdit('fullName')}>
+          <TouchableOpacity onPress={() => toggleEdit('name')}>
             <Icon name="edit" size={24} color="#000" />
           </TouchableOpacity>
         </View>
@@ -85,18 +122,21 @@ const AccountScreen = () => {
         <View style={styles.infoRow}>
           <View style={styles.infoTextContainer}>
             <Text style={styles.infoLabel}>Nome Público</Text>
-            {isEditing.publicName ? (
+            {isEditing.name ? (
               <TextInput
                 style={styles.input}
-                value={values.publicName}
-                onChangeText={(text) => handleChange('publicName', text)}
-                onBlur={() => toggleEdit('publicName')}
+                value={values.name}
+                onChangeText={(text) => handleChange('name', text)}
+                onBlur={() => {
+                  toggleEdit('name');
+                  updateUserData();
+                }}
               />
             ) : (
-              <Text style={styles.infoValue}>{values.publicName}</Text>
+              <Text style={styles.infoValue}>{values.name}</Text>
             )}
           </View>
-          <TouchableOpacity onPress={() => toggleEdit('publicName')}>
+          <TouchableOpacity onPress={() => toggleEdit('name')}>
             <Icon name="edit" size={24} color="#000" />
           </TouchableOpacity>
         </View>
@@ -110,7 +150,10 @@ const AccountScreen = () => {
                 style={styles.input}
                 value={values.email}
                 onChangeText={(text) => handleChange('email', text)}
-                onBlur={() => toggleEdit('email')}
+                onBlur={() => {
+                  toggleEdit('email');
+                  updateUserData();
+                }}
               />
             ) : (
               <Text style={styles.infoValue}>{values.email}</Text>
@@ -128,16 +171,20 @@ const AccountScreen = () => {
             {isEditing.password ? (
               <TextInput
                 style={styles.input}
-                value={values.password}
-                onChangeText={(text) => handleChange('password', text)}
-                onBlur={() => toggleEdit('password')}
-                secureTextEntry
+                value={values.senha}
+                onChangeText={(text) => handleChange('senha', text)}
+                onBlur={() => {
+                  toggleEdit('senha');
+                  updateUserData();
+                }}
               />
             ) : (
-              <Text style={styles.infoValue}>{values.password}</Text>
+              <Text style={styles.infoValue} secureTextEntry={true}>
+                {values.senha}
+                </Text>
             )}
           </View>
-          <TouchableOpacity onPress={() => toggleEdit('password')}>
+          <TouchableOpacity onPress={() => toggleEdit('senha')}>
             <Icon name="edit" size={24} color="#000" />
           </TouchableOpacity>
         </View>
@@ -173,22 +220,8 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     marginBottom: 24,
   },
-  avatar: {
-    width: 65,
-    height: 65,
-    borderRadius: 50,
-    backgroundColor: '#6699CC',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 20,
-  },
-  avatarText: {
-    color: 'white',
-    fontSize: 26,
-    fontWeight: 'bold',
-  },
   userDetails: {
-    flex: 1,
+    marginLeft: 20,
   },
   userName: {
     fontSize: 20,
@@ -197,6 +230,14 @@ const styles = StyleSheet.create({
   userEmail: {
     color: '#4f7bbd',
     marginTop: 4,
+  },
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 4,
   },
   section: {
     backgroundColor: '#f4f4f4',

@@ -4,8 +4,10 @@ import { useRouter } from 'expo-router';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Icons from 'react-native-vector-icons/AntDesign';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Drawer from '../menu/Drawer1';
 
 export default function Home() {
+  const [isDrawerVisible, setDrawerVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [blocks, setBlocks] = useState([]);
   const [blockName, setBlockName] = useState('');
@@ -67,14 +69,15 @@ export default function Home() {
   return (
     <View>
       <ImageBackground source={require('../img/gradient.png')} style={styles.navbar}>
-        <TouchableOpacity style={styles.iconButton}>
-          <Icon name="menu" size={40} color="#fff" />
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.iconButton} onPress={() => setDrawerVisible(true)}>
+                        <Icon name="menu" size={40} color="#fff" />
+                    </TouchableOpacity>
         <Text style={styles.title}>SCHEDULE</Text>
         <TouchableOpacity style={styles.iconButton}>
           <Icon name="account-circle" size={40} color="#fff" />
         </TouchableOpacity>
       </ImageBackground>
+      {isDrawerVisible && <Drawer onClose={() => setDrawerVisible(false)} />}
       <Image source={require('../img/inicio.jpeg')} style={styles.image} />
       <Text style={styles.title2}>Criar bloco</Text>
       <Text style={styles.description}> {'\n'}Crie um bloco e comece a organizar suas {'\n'}tarefas!</Text>

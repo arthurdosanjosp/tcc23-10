@@ -2,91 +2,183 @@ import React, { useState } from 'react';
 import {
     View,
     ImageBackground,
-    TouchableOpacity,
     TextInput,
-    StyleSheet,
+    TouchableOpacity,
     Text,
+    StyleSheet,
     StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
 
 const CustomScreen = () => {
-    const [searchText, setSearchText] = useState('');
     const router = useRouter();
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [question, setQuestion] = useState('');
+    const [description, setDescription] = useState('');
 
     return (
-        <ImageBackground source={require('../img/gradient.png')} style={styles.navbar}>
-            <View style={styles.navTop}>
-                <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}>
-                    <Icon name="arrow-back" size={35} color="#fff" />
-                </TouchableOpacity>
-                <Text style={styles.title1}>Comunidade</Text>
-                <TouchableOpacity style={styles.iconButton}>
-                    <Icon name="account-circle" size={40} color="#fff" />
-                </TouchableOpacity>
-            </View>
-            <View style={styles.searchContainer}>
+        <View>
+            {/* ImageBackground on top */}
+            <ImageBackground
+                source={require('../img/gradient.png')}
+                style={styles.navbar}
+            >
+                <View style={styles.navTop}>
+                    <TouchableOpacity
+                        style={styles.iconButton}
+                        onPress={() => router.back()}
+                    >
+                        <Icon name="arrow-back" size={35} color="#fff" />
+                    </TouchableOpacity>
+                    <Text style={styles.title1}>Suporte</Text>
+                    <TouchableOpacity style={styles.iconButton}>
+                        <Icon name="account-circle" size={40} color="#fff" />
+                    </TouchableOpacity>
+                </View>
+            </ImageBackground>
+
+            {/* Form content below the ImageBackground */}
+            <View style={styles.formContainer}>
+                <Text style={styles.label}>
+                    <Text style={styles.asterisk}>*</Text> Nome
+                </Text>
                 <TextInput
-                    style={styles.searchBar}
-                    placeholder="Pesquisar"
+                    style={styles.input}
+                    placeholder="Nome"
+                    value={name}
+                    onChangeText={setName}
                     placeholderTextColor="#888"
-                    value={searchText}
-                    onChangeText={(text) => setSearchText(text)}
                 />
-                <Icon name="search" size={24} color="#888" style={styles.searchIcon} />
+                
+                <Text style={styles.label}>
+                    <Text style={styles.asterisk}>*</Text> E-mail
+                </Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="E-mail"
+                    value={email}
+                    onChangeText={setEmail}
+                    placeholderTextColor="#888"
+                    keyboardType="email-address"
+                />
+
+                <Text style={styles.label}>
+                    <Text style={styles.asterisk}>*</Text> Pergunta
+                </Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Pergunta"
+                    value={question}
+                    onChangeText={setQuestion}
+                    placeholderTextColor="#888"
+                />
+
+                <Text style={styles.label}>
+                    <Text style={styles.asterisk}>*</Text> Descrição
+                </Text>
+                <TextInput
+                    style={styles.textArea}
+                    placeholder="Descrição"
+                    value={description}
+                    onChangeText={setDescription}
+                    placeholderTextColor="#888"
+                    multiline={true}
+                    numberOfLines={4}
+                />
+
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.cancelButton}>
+                        <Text style={styles.cancelText}>Cancelar</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.sendButton}>
+                        <Text style={styles.sendText}>Enviar</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-        </ImageBackground>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     navbar: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingHorizontal: 10,
-        paddingVertical: 15,
-        height: 190,
-        top: -49,
+        height: 150, // Height of the ImageBackground
+        justifyContent: 'center',
         paddingTop: StatusBar.currentHeight || 20,
+        paddingHorizontal: 10,
     },
     navTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         width: '100%',
-        height: 100,
     },
     iconButton: {
         padding: 15,
-        top: 10,
     },
     title1: {
         fontSize: 28,
         color: 'white',
         fontWeight: 'bold',
-        right: 45,
-        top: 10,
     },
-    searchContainer: {
-        width: '100%',
-        paddingHorizontal: 10,
-        marginTop: 10,
+    formContainer: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#fff',
     },
-    searchBar: {
+    label: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    asterisk: {
+        color: 'red',
+    },
+    input: {
         width: '100%',
         height: 40,
         borderColor: '#ddd',
         borderWidth: 1,
-        borderRadius: 20,
-        paddingHorizontal: 15,
-        backgroundColor: '#fff',
+        borderRadius: 1,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+        backgroundColor: '#f1f1f1',
     },
-    searchIcon: {
-        position: 'absolute',
-        right: 20,
-        top: 8,
+    textArea: {
+        width: '100%',
+        borderColor: '#ddd',
+        borderWidth: 1,
+        borderRadius: 1,
+        paddingHorizontal: 10,
+        paddingVertical: 10,
+        backgroundColor: '#f1f1f1',
+        marginBottom: 20,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    cancelButton: {
+        borderColor: '#4682B4',
+        borderWidth: 1,
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
+    cancelText: {
+        color: '#4682B4',
+        fontWeight: 'bold',
+    },
+    sendButton: {
+        backgroundColor: '#4682B4',
+        borderRadius: 5,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+    },
+    sendText: {
+        color: '#fff',
+        fontWeight: 'bold',
     },
 });
 

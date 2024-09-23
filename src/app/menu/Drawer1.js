@@ -97,18 +97,18 @@ const Drawer = ({ onClose }) => {
       <View style={styles.items}></View>
       <View style={styles.items}>
       <TouchableOpacity onPress={() => handleNavigation('/blocos/areadtrabalho')} style={styles.item}>
-      <Icon name="work" size={25} color="#696969" />
+          <Icon name="work" size={25} color="#696969" />
           <Text style={styles.itemText}>Área de Trabalho</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.items}>
-      <TouchableOpacity onPress={() => handleNavigation('/navbar/meusblocos')} style={styles.item}>
+        <TouchableOpacity onPress={() => handleNavigation('/navbar/meusblocos')} style={styles.item}>
           <Icon name="view-quilt" size={25} color="#696969" />
           <Text style={styles.itemText}>Meus Blocos</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.items}>
-      <TouchableOpacity onPress={onClose} style={styles.item}>
+        <TouchableOpacity onPress={() => handleNavigation('/navbar/favoritos')} style={styles.item}>
           <Icon name="favorite" size={25} color="#696969" />
           <Text style={styles.itemText}>Favoritos</Text>
         </TouchableOpacity>
