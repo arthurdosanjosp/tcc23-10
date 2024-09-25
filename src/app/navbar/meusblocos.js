@@ -3,6 +3,8 @@ import { View, ImageBackground, TouchableOpacity, TextInput, StyleSheet, Text, F
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Drawer from '../menu/Drawer2';
+import { useRouter } from 'expo-router';
+
 
 const ScheduleHeader = () => {
     const [isDrawerVisible, setDrawerVisible] = useState(false);
@@ -15,6 +17,7 @@ const ScheduleHeader = () => {
     const [hiddenBlocks, setHiddenBlocks] = useState([]);
     const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] = useState(false);
     const [blockToDeleteId, setBlockToDeleteId] = useState(null);
+    const router = useRouter();
 
 
     useEffect(() => {
@@ -207,7 +210,7 @@ const ScheduleHeader = () => {
                         <Icon name="menu" size={40} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.title1}>SCHEDULE</Text>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity  onPress={() => router.push('/navbar/configuracoes')} style={styles.iconButton}>
                         <Icon name="account-circle" size={40} color="#fff" />
                     </TouchableOpacity>
                 </View>
@@ -474,10 +477,6 @@ const styles = StyleSheet.create({
         marginBottom: 3,
         flexDirection: 'row',
         alignItems: 'center',
-        top: '-160%',
-        marginTop: '-1%',
-        width: '90%',
-        left: 15,
     },
     iconContainer: {
         marginRight: 22,

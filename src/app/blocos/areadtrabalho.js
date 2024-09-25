@@ -503,7 +503,7 @@ export default function Areadtrabalho() {
                         <Icon name="menu" size={40} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.title1}>SCHEDULE</Text>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity  onPress={() => router.push('/navbar/configuracoes')}style={styles.iconButton}>
                         <Icon name="account-circle" size={40} color="#fff" />
                     </TouchableOpacity>
                 </View>
@@ -877,13 +877,15 @@ const styles = StyleSheet.create({
         justifyContent: 'start',
     },
     block: {
-        width: 140,
-        padding: 20,
-        borderRadius: 20,
-        marginBottom: 10,
-        marginHorizontal: 10,
-        height: 130,
-        justifyContent: 'space-between',
+       
+            width: 140,
+            padding: 20,
+            borderRadius: 20,
+            marginBottom: 10,
+            marginHorizontal: 10,
+            height: 130,
+            justifyContent: 'space-between',
+      
     },
     blockFooter: {
         flexDirection: 'row',
@@ -1100,9 +1102,6 @@ const styles = StyleSheet.create({
         marginBottom: 3,
         flexDirection: 'row',
         alignItems: 'center',
-        top: '-170%',
-        marginTop: '-1%',
-      
     },
     iconContainer: {
         marginRight: 22,

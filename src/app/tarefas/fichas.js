@@ -4,9 +4,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker'; 
-
+import Drawer from '../menu/Drawer1';
 
 export default function CriarBloco() {
+    const [isDrawerVisible, setDrawerVisible] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
     const [colunaNome, setColunaNome] = useState('');
     const [colunas, setColunas] = useState([]);
@@ -387,19 +388,23 @@ const [colunaToDelete, setColunaToDelete] = useState(null);
     return (
         <View style={{ flex: 1 }}>
             <ImageBackground source={require('../img/gradient.png')} style={styles.navbar}>
-                <TouchableOpacity style={styles.iconButton}>
-                    <Icon name="menu" size={40} color="#fff" />
-                </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={() => setDrawerVisible(true)}>
+                        <Icon name="menu" size={40} color="#fff" />
+                    </TouchableOpacity>
                 <Text style={styles.title}>SCHEDULE</Text>
-                <TouchableOpacity style={styles.iconButton}>
+                <TouchableOpacity  onPress={() => router.push('/navbar/configuracoes')} style={styles.iconButton}>
                     <Icon name="account-circle" size={40} color="#fff" />
                 </TouchableOpacity>
             </ImageBackground>
+            {isDrawerVisible && <Drawer onClose={() => setDrawerVisible(false)} />}
+          
+
+           
             <View style={styles.header}>
                 <TouchableOpacity style={styles.iconButton} onPress={() => router.back()}>
                     <Icon name="arrow-back" size={30} color="#000" />
                 </TouchableOpacity>
-                <Text style={styles.headerText}>   {blockName}</Text>
+                <Text style={styles.headerText}numberOfLines={1}>{blockName}</Text>
                 <View style={styles.iconContainer}>
                     <TouchableOpacity style={styles.iconButton} onPress={() => setModalVisible(true)}>
                         <Icon name="add" size={30} color="#000" />
@@ -409,7 +414,7 @@ const [colunaToDelete, setColunaToDelete] = useState(null);
                     </TouchableOpacity>
                 </View>
             </View>
-
+           
             <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.scrollContentContainer}>
                 {colunas.map((coluna, index) => (
                     <View key={index} style={styles.tarefasContainer}>
@@ -796,10 +801,13 @@ const styles = StyleSheet.create({
         top: -20,
     },
     headerText: {
+        flex: 1, // O texto ocupa o espaço restante entre os ícones
         fontSize: 24,
         color: '#1E90FF',
         fontWeight: 'bold',
-        right: 80,
+        textAlign: 'center', // Centraliza o texto horizontalmente
+        marginHorizontal: 10, // Espaçamento para não encostar nos ícones
+        maxWidth: '60%', // Limita a largura do texto para não ultrapassar os ícones
     },
     iconContainer: {
         flexDirection: 'row',

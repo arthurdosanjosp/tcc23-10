@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     ImageBackground,
@@ -7,9 +7,12 @@ import {
     Text,
     StyleSheet,
     StatusBar,
+    ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebaseConfig';
 
 const CustomScreen = () => {
     const router = useRouter();
@@ -18,9 +21,29 @@ const CustomScreen = () => {
     const [question, setQuestion] = useState('');
     const [description, setDescription] = useState('');
 
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    const userDocRef = doc(db, 'usuarios', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        setName(userData.name || '');
+                        setEmail(userData.email || '');
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao recuperar dados do usuário:', error);
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
     return (
-        <View>
-            {/* ImageBackground on top */}
+        <View style={styles.container}>
             <ImageBackground
                 source={require('../img/gradient.png')}
                 style={styles.navbar}
@@ -33,14 +56,16 @@ const CustomScreen = () => {
                         <Icon name="arrow-back" size={35} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.title1}>Suporte</Text>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity
+                        onPress={() => router.push('/navbar/configuracoes')}
+                        style={styles.iconButton}
+                    >
                         <Icon name="account-circle" size={40} color="#fff" />
                     </TouchableOpacity>
                 </View>
             </ImageBackground>
 
-            {/* Form content below the ImageBackground */}
-            <View style={styles.formContainer}>
+            <ScrollView contentContainerStyle={styles.formContainer}>
                 <Text style={styles.label}>
                     <Text style={styles.asterisk}>*</Text> Nome
                 </Text>
@@ -51,7 +76,7 @@ const CustomScreen = () => {
                     onChangeText={setName}
                     placeholderTextColor="#888"
                 />
-                
+
                 <Text style={styles.label}>
                     <Text style={styles.asterisk}>*</Text> E-mail
                 </Text>
@@ -96,34 +121,37 @@ const CustomScreen = () => {
                         <Text style={styles.sendText}>Enviar</Text>
                     </TouchableOpacity>
                 </View>
-            </View>
+            </ScrollView>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#fff',
+    },
     navbar: {
-        height: 150, // Height of the ImageBackground
-        justifyContent: 'center',
-        paddingTop: StatusBar.currentHeight || 20,
         paddingHorizontal: 10,
+        paddingVertical: 15,
+        height: 120,
+        paddingTop: StatusBar.currentHeight || 20,
     },
     navTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        width: '100%',
     },
     iconButton: {
-        padding: 15,
+        padding: 10,
     },
     title1: {
-        fontSize: 28,
+        fontSize: 24,
         color: 'white',
         fontWeight: 'bold',
     },
     formContainer: {
-        flex: 1,
+        flexGrow: 1,
         padding: 20,
         backgroundColor: '#fff',
     },
@@ -137,11 +165,11 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        height: 40,
+        height: 50,
         borderColor: '#ddd',
         borderWidth: 1,
-        borderRadius: 1,
-        paddingHorizontal: 10,
+        borderRadius: 8,
+        paddingHorizontal: 15,
         marginBottom: 20,
         backgroundColor: '#f1f1f1',
     },
@@ -149,8 +177,8 @@ const styles = StyleSheet.create({
         width: '100%',
         borderColor: '#ddd',
         borderWidth: 1,
-        borderRadius: 1,
-        paddingHorizontal: 10,
+        borderRadius: 8,
+        paddingHorizontal: 15,
         paddingVertical: 10,
         backgroundColor: '#f1f1f1',
         marginBottom: 20,
@@ -162,8 +190,8 @@ const styles = StyleSheet.create({
     cancelButton: {
         borderColor: '#4682B4',
         borderWidth: 1,
-        borderRadius: 5,
-        paddingVertical: 10,
+        borderRadius: 8,
+        paddingVertical: 12,
         paddingHorizontal: 20,
     },
     cancelText: {
@@ -172,8 +200,8 @@ const styles = StyleSheet.create({
     },
     sendButton: {
         backgroundColor: '#4682B4',
-        borderRadius: 5,
-        paddingVertical: 10,
+        borderRadius: 8,
+        paddingVertical: 12,
         paddingHorizontal: 20,
     },
     sendText: {

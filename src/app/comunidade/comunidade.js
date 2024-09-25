@@ -12,6 +12,9 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRouter } from 'expo-router';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../config/firebaseConfig';
+
 
 const CustomScreen = () => {
     const [searchText, setSearchText] = useState('');
@@ -27,7 +30,45 @@ const CustomScreen = () => {
     const [selectedTags, setSelectedTags] = useState([]);
 
     const router = useRouter();
-
+    
+    const [values, setValues] = useState({
+        name: '',
+      });
+      const [isEditing, setIsEditing] = useState({
+      });
+      
+      useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const user = auth.currentUser;
+            if (user) {
+              const userDocRef = doc(db, 'usuarios', user.uid); 
+              const userDoc = await getDoc(userDocRef);
+              if (userDoc.exists()) {
+                setValues(userDoc.data());
+              }
+            }
+          } catch (error) {
+            console.error('Erro ao recuperar dados do usuário:', error);
+          }
+        };
+    
+        fetchUserData();
+      }, []);
+    
+      const toggleEdit = (field) => {
+        setIsEditing((prev) => ({
+          ...prev,
+          [field]: !prev[field],
+        }));
+      };
+    
+      const handleChange = (field, text) => {
+        setValues((prev) => ({
+          ...prev,
+          [field]: text,
+        }));
+      };
     // Função para atualizar a lista filtrada com base no texto de pesquisa
     useEffect(() => {
         if (searchText.trim() === '') {
@@ -88,7 +129,18 @@ const CustomScreen = () => {
                             <Text style={styles.userInitial}>L</Text>
                         </View>
 
-                        <Text style={styles.userName}>Livia</Text>
+                        <View style={styles.userInfo}>
+          {isEditing.name ? (
+            <TextInput
+              style={styles.input}
+              value={values.name}
+              onChangeText={(text) => handleChange('name', text)}
+              onBlur={() => toggleEdit('name')}
+            />
+          ) : (
+            <Text style={styles.infoValue}>{values.name}</Text>
+          )}
+        </View>
                     </View>
 
                     <View style={styles.commentInfo}>
@@ -112,7 +164,7 @@ const CustomScreen = () => {
                         <Icon name="arrow-back" size={35} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.title1}>Comunidade</Text>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity  onPress={() => router.push('/navbar/configuracoes')} style={styles.iconButton}>
                         <Icon name="account-circle" size={40} color="#fff" />
                     </TouchableOpacity>
                 </View>

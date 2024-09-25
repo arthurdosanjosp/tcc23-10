@@ -3,6 +3,7 @@ import { View, ImageBackground, TouchableOpacity, TextInput, StyleSheet, Text, F
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Drawer from '../menu/Drawer3';
+import { useRouter } from 'expo-router';
 
 const Favoritos = () => {
     const [isDrawerVisible, setDrawerVisible] = useState(false);
@@ -14,6 +15,7 @@ const Favoritos = () => {
     const [hiddenBlocks, setHiddenBlocks] = useState([]);
     const [confirmDeleteModalVisible, setConfirmDeleteModalVisible] = useState(false);
     const [blockToDeleteId, setBlockToDeleteId] = useState(null);
+    const router = useRouter();
 
     useEffect(() => {
         const loadBlocks = async () => {
@@ -189,7 +191,7 @@ const Favoritos = () => {
                         <Icon name="menu" size={40} color="#fff" />
                     </TouchableOpacity>
                     <Text style={styles.title1}>SCHEDULE</Text>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity  onPress={() => router.push('/navbar/configuracoes')} style={styles.iconButton}>
                         <Icon name="account-circle" size={40} color="#fff" />
                     </TouchableOpacity>
                 </View>

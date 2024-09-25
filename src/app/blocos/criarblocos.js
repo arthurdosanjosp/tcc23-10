@@ -73,7 +73,7 @@ export default function Home() {
                         <Icon name="menu" size={40} color="#fff" />
                     </TouchableOpacity>
         <Text style={styles.title}>SCHEDULE</Text>
-        <TouchableOpacity style={styles.iconButton}>
+         <TouchableOpacity  onPress={() => router.push('/navbar/configuracoes')} style={styles.iconButton}>
           <Icon name="account-circle" size={40} color="#fff" />
         </TouchableOpacity>
       </ImageBackground>
