@@ -6,7 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebaseConfig';
 
 const Drawer = ({ onClose }) => {
-        const router = useRouter();
+  const router = useRouter();  
         const [values, setValues] = useState({
           name: '',
           publicName: '',
@@ -51,12 +51,12 @@ const Drawer = ({ onClose }) => {
 
   const handleNavigation = (path) => {
     router.push(path);
-    onClose(); // Fecha o menu ao navegar para outra tela
+    onClose(); 
   };
 
   const handleGoBack = () => {
-    router.back(); // Função para voltar à tela anterior
-    onClose(); // Fecha o menu ao voltar para a tela anterior
+    router.back();
+    onClose();
   };
 
   return (
@@ -96,7 +96,7 @@ const Drawer = ({ onClose }) => {
       {/* Itens do menu */}
       <View style={styles.items}></View>
       <View style={styles.items}>
-        <TouchableOpacity onPress={handleGoBack} style={styles.item}>
+        <TouchableOpacity onPress={() => handleNavigation('/blocos/areadtrabalho')} style={styles.item}>
           <Icon name="work" size={25} color="#696969" />
           <Text style={styles.itemText}>Área de Trabalho</Text>
         </TouchableOpacity>
@@ -145,14 +145,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'white', // Cor de fundo alterada para cinza claro
     paddingTop: 40,
     zIndex: 1000,
-    paddingHorizontal: 10, // Adicionado padding horizontal para dar mais espaçamento nas laterais
+    paddingHorizontal: 10, 
   },
   menuIcon: {
     position: 'absolute',
     top: 10,
     left: 10,
-    zIndex: 1001, // Para garantir que o menu fique sobreposto
-    padding: 5, // Para aumentar a área clicável do ícone
+    zIndex: 1001, 
+    padding: 5, 
   },
   header: {
     flexDirection: 'row',
@@ -177,8 +177,8 @@ const styles = StyleSheet.create({
   items: {
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0', // Linha de separação entre os itens mais discreta
-    marginBottom: 20, // Espaçamento menor entre os itens
+    borderBottomColor: '#E0E0E0', 
+    marginBottom: 20,
   },
   item: {
     flexDirection: 'row',

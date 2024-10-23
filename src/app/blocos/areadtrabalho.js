@@ -460,39 +460,36 @@ export default function Areadtrabalho() {
         };
     
   
-    const renderItem = ({ item }) => (
-        // Se o bloco estiver na lista de blocos ocultos, não renderize ele
-        hiddenBlocks.includes(item.id) ? null : (
-            <Link href={`/tarefas/fichas?blockName=${item.name}`}>
-                <View style={[styles.block, { backgroundColor: item.color }]}>
-                    <Text style={styles.blockText}>{item.name}</Text>
-                    <View style={styles.blockFooter}>
-                        <TouchableOpacity
-                            style={styles.iconTouchable}
-                            onPress={() => toggleFavorite(item.id)}
-                        >
-                            <Icon name="favorite" size={15} color={favoritedBlocks.includes(item.id) ? "red" : "#fff"} />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.iconTouchable}
-                            onPress={() => handleVisibilityToggle(item.id)}
-                        >
-                            <Icon name="visibility" size={15} color="#fff" />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            style={styles.iconTouchable}
-                            onPress={() => handleDeleteBlock(item.id)}
-                        >
-                            <Icon name="delete" size={15} color="#fff" />
-                        </TouchableOpacity>
+        const renderItem = ({ item }) => (
+            // Se o bloco estiver na lista de blocos ocultos, não renderize ele
+            hiddenBlocks.includes(item.id) ? null : (
+                <Link href={`/tarefas/fichas?blockName=${item.name}`}>
+                    <View style={[styles.block, { backgroundColor: item.color }]}>
+                        <Text style={styles.blockText}>{item.name}</Text>
+                        <View style={styles.blockFooter}>
+                            <TouchableOpacity
+                                style={styles.iconTouchable}
+                                onPress={() => toggleFavorite(item.id)}
+                            >
+                                <Icon name="favorite" size={15} color={favoritedBlocks.includes(item.id) ? "red" : "#fff"} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.iconTouchable}
+                                onPress={() => handleVisibilityToggle(item.id)}
+                            >
+                                <Icon name="visibility" size={15} color="#fff" />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.iconTouchable}
+                                onPress={() => handleDeleteBlock(item.id)}
+                            >
+                                <Icon name="delete" size={15} color="#fff" />
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                    
-                </View>
-            </Link>
-            
-        )
-    );
-
+                </Link>
+            )
+        );
     return (
         
         <View>

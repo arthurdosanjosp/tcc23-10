@@ -309,6 +309,12 @@ const CustomScreen = () => {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.optionButton}
+                            onPress={() => handleTagSelect('Cor')}
+                        >
+                            <Text style={styles.optionText}>Cor</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.optionButton}
                             onPress={() => handleTagSelect('Outros')}
                         >
                             <Text style={styles.optionText}>Outros</Text>

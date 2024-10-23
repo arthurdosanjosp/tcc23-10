@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Pressable, Alert, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/AntDesign';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth, db } from './config/firebaseConfig'; 
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'expo-router'; 
@@ -31,13 +31,16 @@ const CriarContaScreen = () => {
             const user = userCredential.user;
             console.log('Usuário criado:', user);
 
-            
             await setDoc(doc(db, 'usuarios', user.uid), {
                 name: nome,
                 email: email,
                 senha: senha,
             });
             console.log('Usuário salvo com sucesso!');
+
+            // Send email verification
+            await sendEmailVerification(user);
+            Alert.alert('Verificação de Email Enviada', 'Verifique seu email para confirmar sua conta.');
 
             setNome('');
             setEmail('');
@@ -56,10 +59,9 @@ const CriarContaScreen = () => {
 
     return (
         <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      
-    >
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
             <Pressable style={styles.backButton} onPress={() => router.back()}>
                 <Icon name="arrowleft" size={30} color="black" />
             </Pressable>
@@ -69,7 +71,6 @@ const CriarContaScreen = () => {
             <Text style={styles.title}>Criar Conta</Text>
             <View style={styles.spacer} />
             <View style={styles.spacer} />
-
 
             <View style={styles.inputContainer}>
                 <Icon name="user" size={25} color="gray" />
@@ -109,10 +110,9 @@ const CriarContaScreen = () => {
                     <Text style={styles.buttonText}>CADASTRAR</Text>
                 </Pressable>
             </View>
-       </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,

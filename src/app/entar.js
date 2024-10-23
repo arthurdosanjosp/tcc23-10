@@ -18,10 +18,14 @@ const EntrarScreen = () => {
         signInWithEmailAndPassword(auth, email, senha)
             .then((userCredential) => {
                 const user = userCredential.user;
-                console.log('Usuário logado:', user);
-                setTimeout(() => {
-                    router.push('/blocos/criarblocos');
-                }, 100); 
+                if (user.emailVerified) {
+                    console.log('Usuário logado:', user);
+                    setTimeout(() => {
+                        router.push('/blocos/criarblocos');
+                    }, 100); 
+                } else {
+                    Alert.alert('Por favor, verifique seu email antes de fazer login.');
+                }
             })
             .catch((error) => {
                 console.error(error);
@@ -39,7 +43,6 @@ const EntrarScreen = () => {
                 <Icon name="arrowleft" size={30} color="black" />
             </Pressable>
             <Image style={styles.imageTop} source={require('./img/bola3.jpeg')} />
-            <Text style={styles.forgotPasswordText}></Text>
             <Text style={styles.title}>Entrar</Text>
             <Text style={styles.welcomeText}>Bem-Vindo de Volta!</Text>
             <Image style={styles.imageBottom} source={require('./img/bola2.jpeg')} />
@@ -63,7 +66,6 @@ const EntrarScreen = () => {
                 />
             </View>
 
-            <Text style={styles.forgotPasswordText}></Text>
             <View style={styles.buttonContainer}>
                 <Pressable onPress={logar} style={styles.button}>
                     <Text style={styles.buttonText}>ENTRAR</Text>
